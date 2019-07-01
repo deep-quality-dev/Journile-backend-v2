@@ -10,14 +10,18 @@ import passport from 'passport';
 import config from './config';
 import typeDefs from './graphql/schema';
 import resolvers from './graphql/resolvers';
+import schemaDirectives from './graphql/directives';
 import { sequelize } from './models';
 
 const apollo = new ApolloServer({
   typeDefs,
   resolvers,
+  schemaDirectives,
   context: async ({ req, res }) => {
     return {
-      authorization: req.headers.Authorization
+      authorization: req.headers.authorization,
+      req,
+      res
     };
   },
 })

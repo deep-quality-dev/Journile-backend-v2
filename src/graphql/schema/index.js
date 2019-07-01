@@ -1,5 +1,8 @@
+/* @flow */
+
 import { gql } from 'apollo-server-express';
 
+import { schemas as directiveSchemas } from '../directives';
 import userSchema from './user';
 
 const linkSchema = gql`
@@ -13,4 +16,4 @@ const linkSchema = gql`
   }
 `;
 
-export default [linkSchema, userSchema];
+export default [...directiveSchemas, linkSchema, userSchema];
