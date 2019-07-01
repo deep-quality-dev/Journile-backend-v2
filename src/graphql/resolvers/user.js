@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 
 import config from '../../config';
 import models from '../../models';
+import { authenticateUser } from '../../middleware/passport';
 
 const createToken = async (user) => {
   const { id, username, email, first_name, last_name, status } = user;
@@ -27,25 +28,26 @@ export default {
   Mutation: {
     signin: async (
       parent,
-      { input },
-      { models, secret },
+      { input: { login, password } },
+      { req, res }
     ) => {
-      const { login, password } = input
-      const user = await models.User.findByLogin(login);
+      req.body = {
+        ...req.body,
+        login,
+        password,
+      };
 
-      if (!user) {
-        throw new UserInputError(
-          'No user found with this login credentials.',
-        );
-      }
+      try {
+        const { user, info } = await authenticateUser(req, res);
 
-      const isValid = await user.validatePassword(password);
+        if (!user) {
+          throw new UserInputError(
+            info.message
+          );
+        }
 
-      if (!isValid) {
-        throw new AuthenticationError('Invalid password.');
-      }
-
-      return { token: createToken(user, secret, '30m') };
+        return { token: createToken(user) };
+      } catch (err) { throw err }
     },
   },
 };

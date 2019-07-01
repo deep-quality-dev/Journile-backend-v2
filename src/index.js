@@ -5,6 +5,7 @@ import { ApolloServer } from 'apollo-server-express';
 import fs from 'fs';
 import https from 'https';
 import http from 'http';
+import passport from 'passport';
 
 import config from './config';
 import typeDefs from './graphql/schema';
@@ -22,6 +23,8 @@ const apollo = new ApolloServer({
 })
 
 const app = express()
+app.use(passport.initialize())
+
 apollo.applyMiddleware({ app })
 
 // Create the HTTPS or HTTP server, per configuration
