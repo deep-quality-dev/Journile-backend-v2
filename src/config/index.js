@@ -16,4 +16,7 @@ export default {
   db_dialect: process.env.DB_DIALECT,
 
   ssl: process.env.ENVIRONMENT == "production"? process.env.SSL : false,
+
+  secret_key: process.env.SECRET_KEY,
+  token_expiresin: process.env.TOKEN_EXPIRESIN,
 }

@@ -1,16 +1,27 @@
-import { AuthenticationError, UserInputError } from 'apollo-server-express';
+/* @flow */
 
+import { AuthenticationError, UserInputError } from 'apollo-server-express';
+import jwt from 'jsonwebtoken';
+
+import config from '../../config';
 import models from '../../models';
 
-const createToken = async (user, secret, expiresIn) => {
-  const { id, email, username, role } = user;
-  return await jwt.sign({ id, email, username, role }, secret, {
-    expiresIn,
+const createToken = async (user) => {
+  const { id, username, email, first_name, last_name, status } = user;
+  return await jwt.sign({ id, username, email, first_name, last_name, status }, config.secret_key, {
+    expiresIn: config.token_expiresin
   });
 };
 
 export default {
   Query: {
+    me: async (parent, args, { user }) => {
+      if (!user) {
+        return null;
+      }
+
+      return await models.User.findByPk(user.id);
+    },
   },
 
   Mutation: {

@@ -1,3 +1,5 @@
+/* @flow */
+
 import { GraphQLDateTime } from 'graphql-iso-date';
 
 import userResolvers from './user';

@@ -1,3 +1,5 @@
+/* @flow */
+
 import { gql } from 'apollo-server-express';
 
 export default gql`
@@ -21,6 +23,10 @@ export default gql`
   input SigninInput {
     login: String!
     password: String!
+  }
+
+  extend type Query {
+    me: User! @isAuth
   }
 
   extend type Mutation {
