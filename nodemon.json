@@ -2,5 +2,5 @@
   "watch": ["src"],
   "ext": "js",
   "ignore": [],
-  "exec": "babel-node ./src/index.js --presets=babel-preset-env"
+  "exec": "babel-node ./src/index.js"
 }

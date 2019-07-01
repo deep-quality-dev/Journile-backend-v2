@@ -1,4 +1,6 @@
 [ignore]
+<PROJECT_ROOT>/node_modules/bcryptjs/src/bower.json
+<PROJECT_ROOT>/node_modules/graphql-iso-date/
 
 [include]
 

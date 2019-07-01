@@ -27,6 +27,7 @@
   "homepage": "https://github.com/rener172846/Journile_backendv2#readme",
   "dependencies": {
     "apollo-server-express": "^2.6.7",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
@@ -47,6 +48,7 @@
     "babel-loader": "^8.0.6",
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
+    "babel-preset-stage-3": "^6.24.1",
     "flow-bin": "^0.102.0",
     "nodemon": "^1.19.1"
   }
