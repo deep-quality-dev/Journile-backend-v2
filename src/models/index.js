@@ -22,6 +22,7 @@ let sequelize: Sequelize = new Sequelize(
 
 const models = {
   User: sequelize.import('./user'),
+  Post: sequelize.import('./post'),
 };
 
 Object.keys(models).forEach(key => {

@@ -4,6 +4,7 @@ import { gql } from 'apollo-server-express';
 
 import { schemas as directiveSchemas } from '../directives';
 import userSchema from './user';
+import postSchema from './post';
 
 const linkSchema = gql`
   scalar Date
@@ -16,4 +17,9 @@ const linkSchema = gql`
   }
 `;
 
-export default [...directiveSchemas, linkSchema, userSchema];
+export default [
+  ...directiveSchemas,
+  linkSchema,
+  userSchema,
+  postSchema,
+];
