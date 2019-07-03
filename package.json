@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/rener172846/Journile_backendv2#readme",
   "dependencies": {
+    "@babel/runtime": "^7.4.5",
     "apollo-server-express": "^2.6.7",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.0.0",
@@ -43,12 +44,14 @@
     "sequelize": "^5.9.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/preset-stage-3": "^7.0.0",
     "babel-loader": "^8.0.6",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-flow": "^6.23.0",
-    "babel-preset-stage-3": "^6.24.1",
     "flow-bin": "^0.102.0",
     "nodemon": "^1.19.1"
   }
