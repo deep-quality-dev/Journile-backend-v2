@@ -2,6 +2,7 @@
 
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
 import jwt from 'jsonwebtoken';
+import Joi from '@hapi/joi';
 
 import config from '../../config';
 import models from '../../models';
@@ -16,21 +17,31 @@ const createToken = async (user) => {
 
 export default {
   Query: {
-    me: async (parent, args, { user }) => {
+    me: async (parent: any, args: any, context: any ) => {
+      const { user } = context
       if (!user) {
         return null;
       }
 
-      return await models.User.findByPk(user.id);
+      return await models.user.findByPk(user.id);
     },
   },
 
   Mutation: {
-    signin: async (
-      parent,
-      { input: { login, password } },
-      { req, res }
-    ) => {
+    signin: async (parent: any, params: any, context: any) => {
+      const { input: { login, password } } = params
+      const { req, res } = context
+
+      const schema = Joi.object().keys({
+        // username: Joi.string().alphanum().min(3).max(30).required(),
+        login: Joi.string().email({ minDomainSegments: 2 }).required(),
+        password: Joi.string().min(3).max(30).required(),
+      }).with('login', 'password');
+
+      try {
+        Joi.assert({ login, password }, schema);
+      } catch (err) { throw  new UserInputError(err.details[0].message) }
+
       req.body = {
         ...req.body,
         login,
