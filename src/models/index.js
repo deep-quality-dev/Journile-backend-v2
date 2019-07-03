@@ -3,6 +3,8 @@
 import Sequelize from 'sequelize';
 
 import config from '../config';
+import post from './post';
+import user from './user';
 
 let sequelize: Sequelize = new Sequelize(
   config.db_name,
@@ -20,10 +22,16 @@ let sequelize: Sequelize = new Sequelize(
   },
 );
 
-const models = {
-  User: sequelize.import('./user'),
-  Post: sequelize.import('./post'),
-};
+const models = {};
+
+const context = [
+  post,
+  user
+]
+context.forEach(module => {
+  const sequelizeModel = module(sequelize, Sequelize);
+  models[sequelizeModel.name] = sequelizeModel;
+})
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {

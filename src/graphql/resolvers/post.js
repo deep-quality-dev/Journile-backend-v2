@@ -8,10 +8,7 @@ import models from '../../models';
 export default {
   Query: {
     getPosts: async (parent, {date, isLater},) => {
-      console.log('date', date)
-      console.log('isLater', isLater)
-
-      return await models.Post.findPublicPosts(date, isLater);
+      return await models.post.findPublicPosts(date, isLater);
     },
   },
 

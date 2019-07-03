@@ -12,7 +12,7 @@ passport.use('user', new LocalStrategy({
   }, 
   function (login, password, cb) {
     //this one is typically a DB call. Assume that the returned user object is pre-formatted and ready for storing in JWT
-    return models.User.findByLogin(login)
+    return models.user.findByLogin(login)
       .then(user => {
         if (!user) {
           return cb(null, false, {message: 'Incorrect email or password.'});

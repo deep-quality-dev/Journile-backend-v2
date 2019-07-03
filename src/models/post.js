@@ -108,7 +108,6 @@ const post = (sequelize: any, DataTypes: any) => {
     try {
       const posts = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT});
 
-    console.log('posts', posts)
       return posts
     } catch (err) {
       throw err

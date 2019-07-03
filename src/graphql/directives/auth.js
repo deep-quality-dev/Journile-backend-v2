@@ -50,7 +50,6 @@ export class IsAuthDirective extends SchemaDirectiveVisitor {
 		field.resolve = async function (...args) {
 			const [ , params, context ] = args;
 			const { authorization } = context;
-      console.log('context', authorization)
 			if (authorization) {
 				const decoded = await checkAuth(authorization);
 				context.user = decoded;

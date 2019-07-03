@@ -1,6 +1,6 @@
 {
-  "watch": ["src"],
+  "watch": ["src", "webpack.config.js", ".env"],
   "ext": "js",
   "ignore": [],
-  "exec": "babel-node ./src/index.js"
+  "exec": "npm run build:dev && node ./build/index.js"
 }
