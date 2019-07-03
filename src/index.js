@@ -5,6 +5,7 @@ import { ApolloServer } from 'apollo-server-express';
 import fs from 'fs';
 import https from 'https';
 import http from 'http';
+import helmet from 'helmet';
 import passport from 'passport';
 
 import config from './config';
@@ -28,6 +29,7 @@ const apollo = new ApolloServer({
 
 const app = express()
 app.use(passport.initialize())
+app.use(helmet())
 
 apollo.applyMiddleware({ app })
 
