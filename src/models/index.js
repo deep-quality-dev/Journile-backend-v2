@@ -12,7 +12,7 @@ let sequelize: Sequelize = new Sequelize(
   config.db_pass,
   {
     host: config.db_host,
-    port: config.db_post,
+    port: config.db_port,
     dialect: config.db_dialect,
     pool: {
       max: 20,
@@ -23,15 +23,8 @@ let sequelize: Sequelize = new Sequelize(
 );
 
 const models = {};
-
-const context = [
-  post,
-  user
-]
-context.forEach(module => {
-  const sequelizeModel = module(sequelize, Sequelize);
-  models[sequelizeModel.name] = sequelizeModel;
-})
+models.post = post(sequelize, Sequelize)
+models.user = user(sequelize, Sequelize)
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
