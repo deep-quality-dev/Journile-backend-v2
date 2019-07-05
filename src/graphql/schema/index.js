@@ -5,6 +5,7 @@ import { gql } from 'apollo-server-express';
 import { schemas as directiveSchemas } from '../directives';
 
 import categorySchema from './category';
+import channelSchema from './channel';
 import postSchema from './post';
 import userSchema from './user';
 
@@ -23,6 +24,7 @@ export default [
   ...directiveSchemas,
   linkSchema,
   categorySchema,
+  channelSchema,
   postSchema,
   userSchema,
 ];
