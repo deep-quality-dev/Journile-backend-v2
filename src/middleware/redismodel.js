@@ -19,7 +19,7 @@ const methods = [
   'count',
 ];
 
-export default function generateRedisModel(model, options = {}) {
+export default function generateRedisModel(model: any, options: any = {}) {
   options = {
     ttl: 600,
     ...options
@@ -69,7 +69,7 @@ export default function generateRedisModel(model, options = {}) {
         } else if (typeof parsed === 'number') {
           result = parsed;
         } else if (queryOptions) {
-          const buildOptions = {
+          const buildOptions: any = {
             raw: !!queryOptions.raw,
             isNewRecord: !!queryOptions.isNewRecord,
           };
