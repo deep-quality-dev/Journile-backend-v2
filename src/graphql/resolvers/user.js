@@ -23,7 +23,7 @@ export default {
         return null;
       }
 
-      return await models.user.findByPk(user.id);
+      return await models.User.findByPk(user.id);
     },
   },
 

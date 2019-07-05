@@ -9,7 +9,7 @@ export default {
   Query: {
     getPosts: async (parent: any, params: any) => {
       const { date, isLater } = params
-      return await models.post.findPublicPosts(date, isLater);
+      return await models.Post.findPublicPosts(date, isLater);
     },
   },
 
