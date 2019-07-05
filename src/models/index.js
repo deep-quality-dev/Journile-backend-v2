@@ -3,6 +3,8 @@
 import Sequelize from 'sequelize';
 
 import config from '../config';
+import generateRedisModel from '../middleware/redismodel';
+
 import post from './post';
 import user from './user';
 
@@ -23,8 +25,8 @@ let sequelize: Sequelize = new Sequelize(
 );
 
 const models = {};
-models.post = post(sequelize, Sequelize)
-models.user = user(sequelize, Sequelize)
+models.Post = generateRedisModel(post(sequelize, Sequelize))
+models.User = generateRedisModel(user(sequelize, Sequelize))
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
