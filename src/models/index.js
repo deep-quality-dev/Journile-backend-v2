@@ -5,6 +5,7 @@ import Sequelize from 'sequelize';
 import config from '../config';
 import generateRedisModel from '../middleware/redismodel';
 
+import category from './category';
 import post from './post';
 import user from './user';
 
@@ -25,6 +26,7 @@ let sequelize: Sequelize = new Sequelize(
 );
 
 const models = {};
+models.Category = generateRedisModel(category(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
 
