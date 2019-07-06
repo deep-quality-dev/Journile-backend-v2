@@ -14,7 +14,7 @@ const country = (sequelize: any, DataTypes: any) => {
       type: DataTypes.STRING,
     },
     dial_code: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
     },
     status: {
       type: DataTypes.INTEGER,

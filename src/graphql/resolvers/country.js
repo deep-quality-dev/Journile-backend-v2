@@ -17,7 +17,12 @@ export default {
 
     getCountryByCode: async (parent: any, args: any ) => {
       const { code } = args
-      return await models.Country.findOne({ where: { dial_code: code } });
+      return await models.Country.findOne({ where: { country_code: code } });
+    },
+
+    getCountryByDialCode: async (parent: any, args: any ) => {
+      const { dial_code } = args
+      return await models.Country.findOne({ where: { dial_code } });
     },
   },
 };

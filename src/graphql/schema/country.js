@@ -7,7 +7,7 @@ export default gql`
     id: ID!
     name: String!
     country_code: String
-    dial_code: String
+    dial_code: Int
     status: Int! @isAuth
     create_date: Date! @isAuth
     update_date: Date! @isAuth
@@ -17,5 +17,6 @@ export default gql`
     getCountries: [Country]!
     getCountry(id: ID!): Country!
     getCountryByCode(code: String!): Country!
+    getCountryByDialCode(dial_code: Int!): Country!
   }
 `;
