@@ -6,6 +6,7 @@ import { schemas as directiveSchemas } from '../directives';
 
 import categorySchema from './category';
 import channelSchema from './channel';
+import countrySchema from './country';
 import gammatagSchema from './gammatag';
 import postSchema from './post';
 import userSchema from './user';
@@ -26,6 +27,7 @@ export default [
   linkSchema,
   categorySchema,
   channelSchema,
+  countrySchema,
   gammatagSchema,
   postSchema,
   userSchema,
