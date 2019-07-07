@@ -7,6 +7,7 @@ import generateRedisModel from '../middleware/redismodel';
 
 import category from './category';
 import channel from './channel';
+import city from './city';
 import country from './country';
 import gammatag from './gammatag';
 import post from './post';
@@ -31,6 +32,7 @@ let sequelize: Sequelize = new Sequelize(
 const models = {};
 models.Category = generateRedisModel(category(sequelize, Sequelize))
 models.Channel = generateRedisModel(channel(sequelize, Sequelize))
+models.City = generateRedisModel(city(sequelize, Sequelize))
 models.Country = generateRedisModel(country(sequelize, Sequelize))
 models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))

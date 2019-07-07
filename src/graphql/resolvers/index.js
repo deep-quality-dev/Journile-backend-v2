@@ -5,6 +5,7 @@ import { GraphQLDateTime } from 'graphql-iso-date';
 
 import categoryResolvers from './category';
 import channelResolvers from './channel';
+import cityResolvers from './city';
 import countryResolvers from './country';
 import gammatagResolvers from './gammatag';
 import postResolvers from './post';
@@ -40,6 +41,7 @@ export default [
   customScalarResolver,
   categoryResolvers,
   channelResolvers,
+  cityResolvers,
   countryResolvers,
   gammatagResolvers,
   postResolvers,
