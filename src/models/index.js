@@ -38,6 +38,11 @@ models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
 
+
+// Forign keys
+models.Country.hasMany(models.City, { foreignKey: 'country_id' })
+models.City.belongsTo(models.Country, { foreignKey: 'country_id' })
+
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
     models[key].associate(models);

@@ -8,6 +8,7 @@ export default gql`
     name: String!
     country_code: String
     dial_code: Int
+    cities: [City!]
     status: Int! @isAuth
     create_date: Date! @isAuth
     update_date: Date! @isAuth

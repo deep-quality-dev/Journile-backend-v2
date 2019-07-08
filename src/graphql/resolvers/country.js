@@ -1,28 +1,47 @@
 /* @flow */
 
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
+import { fieldsList } from 'graphql-fields-list';
 
 import models from '../../models';
 
+function getQueryOption(info: any) {
+  const fields = fieldsList(info);
+  const option = {}
+  if (fields.includes('cities')) {
+    option['include'] = { model: models.City, as: 'cities' }
+  }
+
+  return option
+}
+
 export default {
   Query: {
-    getCountries: async (parent: any, args: any ) => {
-      return await models.Country.findAll();
+    getCountries: async (parent: any, args: any, context: any, info: any) => {
+      const option = getQueryOption(info)
+
+      return await models.Country.findAll({ ...option });
     },
 
-    getCountry: async (parent: any, args: any ) => {
+    getCountry: async (parent: any, args: any, context: any, info: any) => {
       const { id } = args
-      return await models.Country.findByPk(id);
+      const option = getQueryOption(info)
+
+      return await models.Country.findByPk(id, { ...option });
     },
 
-    getCountryByCode: async (parent: any, args: any ) => {
+    getCountryByCode: async (parent: any, args: any, context: any, info: any) => {
       const { code } = args
-      return await models.Country.findOne({ where: { country_code: code } });
+      const option = getQueryOption(info)
+
+      return await models.Country.findOne({ where: { country_code: code }, ...option });
     },
 
-    getCountryByDialCode: async (parent: any, args: any ) => {
+    getCountryByDialCode: async (parent: any, args: any, context: any, info: any) => {
       const { dial_code } = args
-      return await models.Country.findOne({ where: { dial_code } });
+      const option = getQueryOption(info)
+
+      return await models.Country.findOne({ where: { dial_code }, ...option });
     },
   },
 };
