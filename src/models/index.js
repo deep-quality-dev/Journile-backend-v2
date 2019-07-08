@@ -10,6 +10,7 @@ import channel from './channel';
 import city from './city';
 import country from './country';
 import gammatag from './gammatag';
+import language from './language';
 import post from './post';
 import user from './user';
 
@@ -35,6 +36,7 @@ models.Channel = generateRedisModel(channel(sequelize, Sequelize))
 models.City = generateRedisModel(city(sequelize, Sequelize))
 models.Country = generateRedisModel(country(sequelize, Sequelize))
 models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
+models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
 

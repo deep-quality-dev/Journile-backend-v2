@@ -8,6 +8,7 @@ import channelResolvers from './channel';
 import cityResolvers from './city';
 import countryResolvers from './country';
 import gammatagResolvers from './gammatag';
+import languageResolvers from './language';
 import postResolvers from './post';
 import userResolvers from './user';
 
@@ -23,6 +24,7 @@ export default [
   cityResolvers,
   countryResolvers,
   gammatagResolvers,
+  languageResolvers,
   postResolvers,
   userResolvers,
 ];

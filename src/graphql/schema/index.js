@@ -9,6 +9,7 @@ import channelSchema from './channel';
 import citySchema from './city';
 import countrySchema from './country';
 import gammatagSchema from './gammatag';
+import languageSchema from './language';
 import postSchema from './post';
 import userSchema from './user';
 
@@ -32,6 +33,7 @@ export default [
   citySchema,
   countrySchema,
   gammatagSchema,
+  languageSchema,
   postSchema,
   userSchema,
 ];
