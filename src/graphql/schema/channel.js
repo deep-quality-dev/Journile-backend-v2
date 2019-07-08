@@ -11,7 +11,7 @@ export default gql`
     logo: String
     cover_image: String
     site_url: String
-    country_id: Int
+    country: Country!
     type: Int
     description: String
     status: Int! @isAuth

@@ -45,6 +45,9 @@ models.User = generateRedisModel(user(sequelize, Sequelize))
 models.Country.hasMany(models.City, { foreignKey: 'country_id' })
 models.City.belongsTo(models.Country, { foreignKey: 'country_id' })
 
+models.Country.hasMany(models.Channel, { foreignKey: 'country_id' })
+models.Channel.belongsTo(models.Country, { foreignKey: 'country_id' })
+
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
     models[key].associate(models);
