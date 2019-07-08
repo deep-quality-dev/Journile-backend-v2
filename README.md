@@ -19,19 +19,19 @@ Journile is a smart new social media platform in the world - Say GoodBye To Fake
 
 ## Installation
 
-- Install all the node packages listed in the package.json
+- Install all the node packages listed in the package.json  
   `npm install`
 - Replace **.env.example** to **.env** and complete PostgreSQL database and redis server connection details
 - Prepare database (create tables and populate)
 
 ## Run the node server
 ### Development
-- Run node server
-`npm start`
+- Run node server  
+  `npm start`
 - Browse graphql schema to **http://localhost:4000/graphql**
 
 ### Production
-- Pack and minimize source codes
-`npm build`
-- Run node server as daemon
-`pm2 start build/index.js`
+- Pack and minimize source codes  
+  `npm run build`
+- Run node server as daemon  
+  `pm2 start build/index.js`
