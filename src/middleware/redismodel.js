@@ -19,6 +19,25 @@ const methods = [
   'count',
 ];
 
+function desymbolize(o) {
+  if (Array.isArray(o)) {
+    return o.map(desymbolize);
+  } else if (typeof o != "object") {
+    return o;
+  } else {
+    let d = Object.assign(Object.create(Object.getPrototypeOf(o)), o);
+    Object.getOwnPropertySymbols(o).forEach(k => {
+      const symbol = Symbol.keyFor(k)
+      if (symbol) {
+        d[`<${symbol}>`] = o[k];
+        delete d[k];
+      }
+    });
+    Object.keys(d).forEach(k => d[k] = desymbolize(d[k]));
+    return d;
+  }
+}
+
 export default function generateRedisModel(model: any, options: any = {}) {
   options = {
     ttl: 600,
@@ -35,10 +54,9 @@ export default function generateRedisModel(model: any, options: any = {}) {
 
     cacheKey += method;
     if (args && args.length > 0) {
-      const hash = crypto.createHash('sha1').update(JSON.stringify(args)).digest('hex');
+      const hash = crypto.createHash('sha1').update(JSON.stringify(desymbolize(args))).digest('hex');
       cacheKey += `:${hash}`;
     }
-    console.log('cacheKey', cacheKey);
 
     let cached;
     try {
@@ -57,7 +75,8 @@ export default function generateRedisModel(model: any, options: any = {}) {
 
       try {
         let result;
-        const [queryOptions] = args;
+        let queryOptions;
+        if (args.length > 0) queryOptions = args.slice(-1)[0];
 
         if (queryOptions && !!queryOptions.raw) {
           result = parsed;
