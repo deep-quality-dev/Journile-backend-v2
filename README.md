@@ -25,12 +25,12 @@ Journile is a smart new social media platform in the world - Say GoodBye To Fake
 - Prepare database (create tables and populate)
 
 ## Run the node server
-###Development###
+### Development
 - Run node server
 `npm start`
 - Browse graphql schema to **http://localhost:4000/graphql**
 
-###Production###
+### Production
 - Pack and minimize source codes
 `npm build`
 - Run node server as daemon
