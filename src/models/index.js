@@ -13,6 +13,7 @@ import gammatag from './gammatag';
 import language from './language';
 import post from './post';
 import user from './user';
+import userLogin from './user_login';
 import userSetting from './user_setting';
 
 let sequelize: Sequelize = new Sequelize(
@@ -40,6 +41,7 @@ models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
+models.UserLogin = generateRedisModel(userLogin(sequelize, Sequelize))
 models.UserSetting = generateRedisModel(userSetting(sequelize, Sequelize))
 
 
@@ -51,6 +53,8 @@ models.Country.hasMany(models.Channel, { foreignKey: 'country_id' })
 models.Channel.belongsTo(models.Country, { foreignKey: 'country_id' })
 
 
+models.User.hasMany(models.UserLogin, { foreignKey: 'user_id' })
+models.UserLogin.belongsTo(models.User, { foreignKey: 'user_id' })
 models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
 models.UserSetting.belongsTo(models.User, { foreignKey: 'user_id' })
 
