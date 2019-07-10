@@ -13,6 +13,7 @@ import gammatag from './gammatag';
 import language from './language';
 import post from './post';
 import user from './user';
+import userSetting from './user_setting';
 
 let sequelize: Sequelize = new Sequelize(
   config.db_name,
@@ -39,6 +40,7 @@ models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
+models.UserSetting = generateRedisModel(userSetting(sequelize, Sequelize))
 
 
 // Forign keys
@@ -47,6 +49,10 @@ models.City.belongsTo(models.Country, { foreignKey: 'country_id' })
 
 models.Country.hasMany(models.Channel, { foreignKey: 'country_id' })
 models.Channel.belongsTo(models.Country, { foreignKey: 'country_id' })
+
+
+models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
+models.UserSetting.belongsTo(models.User, { foreignKey: 'user_id' })
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {

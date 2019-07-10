@@ -12,6 +12,7 @@ import gammatagSchema from './gammatag';
 import languageSchema from './language';
 import postSchema from './post';
 import userSchema from './user';
+import userSettingSchema from './user_setting';
 
 const linkSchema = gql`
   scalar Date
@@ -36,4 +37,5 @@ export default [
   languageSchema,
   postSchema,
   userSchema,
+  userSettingSchema,
 ];

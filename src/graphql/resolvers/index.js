@@ -11,6 +11,7 @@ import gammatagResolvers from './gammatag';
 import languageResolvers from './language';
 import postResolvers from './post';
 import userResolvers from './user';
+import userSettingResolvers from './user_setting';
 
 const customScalarResolver = {
   Date: GraphQLDateTime,
@@ -27,4 +28,5 @@ export default [
   languageResolvers,
   postResolvers,
   userResolvers,
+  userSettingResolvers,
 ];
