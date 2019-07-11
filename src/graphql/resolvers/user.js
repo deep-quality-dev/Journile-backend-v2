@@ -8,11 +8,9 @@ import config from '../../config';
 import models from '../../models';
 import { authenticateUser } from '../../middleware/passport';
 
-const createToken = async (user) => {
+const createToken = async (user, expiresIn) => {
   const { id, username, email, first_name, last_name, status } = user;
-  return await jwt.sign({ id, username, email, first_name, last_name, status }, config.secret_key, {
-    expiresIn: config.token_expiresin
-  });
+  return await jwt.sign({ id, username, email, first_name, last_name, status }, config.secret_key, { expiresIn });
 };
 
 export default {
@@ -57,7 +55,16 @@ export default {
           );
         }
 
-        return { token: createToken(user) };
+        const token = await createToken(user, config.token_expiresin)
+        const refresh_token = await createToken(user, config.refresh_token_expiresin)
+
+        await models.UserLogin.create({
+          user_id: user.id,
+          refresh_token,
+          login_type: 0
+        })
+
+        return { token, refresh_token };
       } catch (err) { throw err }
     },
   },

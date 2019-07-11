@@ -41,7 +41,7 @@ models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
-models.UserLogin = generateRedisModel(userLogin(sequelize, Sequelize))
+models.UserLogin = userLogin(sequelize, Sequelize)
 models.UserSetting = generateRedisModel(userSetting(sequelize, Sequelize))
 
 

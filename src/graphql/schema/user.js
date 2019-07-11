@@ -5,6 +5,7 @@ import { gql } from 'apollo-server-express';
 export default gql`
   type Token {
     token: String!
+    refresh_token: String!
   }
   type User {
     id: ID!

@@ -1,5 +1,9 @@
 /* @flow */
 
+import Sequelize from 'sequelize';
+
+const Op = Sequelize.Op;
+
 const userLogin = (sequelize: any, DataTypes: any) => {
   const UserLogin = sequelize.define('user_login', {
     user_id: {
@@ -44,6 +48,20 @@ const userLogin = (sequelize: any, DataTypes: any) => {
     timestamps: false,
     tableName: 'user_login',
   });
+
+  UserLogin.beforeCreate(async userLogin => {
+    try {
+      await UserLogin.expireOldLogins(userLogin.user_id, userLogin.login_type);
+    } catch (e) {
+      console.error(`Error on expiring old refresh tokens: ${e}`)
+    }
+
+    userLogin.login = new Date().toLocaleString()
+  });
+
+  UserLogin.expireOldLogins = async function(user_id: number, login_type: number) {
+    await UserLogin.update({ logout: new Date().toLocaleString(), status: 3 }, { where: { user_id, login_type, status: { [Op.lt]: 3 } }});
+  };
 
   return UserLogin;
 };
