@@ -23,4 +23,5 @@ export default {
 
   secret_key: process.env.SECRET_KEY,
   token_expiresin: process.env.TOKEN_EXPIRESIN,
+  refresh_token_expiresin: process.env.REFRESH_TOKEN_EXPIRESIN,
 }
