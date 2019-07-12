@@ -4,6 +4,7 @@ import { AuthenticationError, UserInputError } from 'apollo-server-express';
 import Sequelize from 'sequelize';
 import jwt from 'jsonwebtoken';
 import Joi from '@hapi/joi';
+import geoip from 'geoip-lite';
 
 import config from '../../config';
 import models from '../../models';
@@ -11,10 +12,15 @@ import { authenticateUser } from '../../middleware/passport';
 
 const Op = Sequelize.Op;
 
-const createToken = async (user, expiresIn) => {
+const createToken = async (user: any, expiresIn: string) => {
   const { id, username, email, first_name, last_name, status } = user;
   return await jwt.sign({ id, username, email, first_name, last_name, status }, config.secret_key, { expiresIn });
 };
+
+const generateRandomCode = (digit: number) => {
+  const start = digit <= 1? 1: Math.pow(10, digit-1);
+  return Math.floor(start + Math.random() * 9 * start);
+}
 
 export default {
   Query: {
@@ -51,8 +57,45 @@ export default {
         throw new UserInputError(`Email or username is already exist`)
       }
 
+      // check location
       let clientip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || (req.connection["socket"] ? req.connection["socket"].remoteAddress : null);
       clientip = ((clientip == null) ? 'undefined' : (clientip == '::1' ? '127.0.0.1' : clientip));
+      
+      let city_id, country_id, geo = geoip.lookup(clientip);
+      if (geo) {
+        console.log('geo location track: ', geo);
+        const city_name = geo.city || "Unknown";
+        const city = await models.City.findOne({ where: { name: { [Op.like]: `%${city_name}%` } }});
+        if (city) city_id = city.id;
+
+        const country_code = geo.country || "Unknown";
+        let country = await models.Country.findOne({ where: { country_code }});
+        if (country) country_id = country.id;
+      }
+
+      const user = await models.User.create({
+        username,
+        password,
+        first_name,
+        last_name,
+        email,
+        phone_number,
+        signup_type: 0,
+        country_id,
+        city_id
+      })
+
+      const activation: any = {};
+      activation.user_id = user.id;
+      activation.code = generateRandomCode(config.activation_code_digit);
+      activation.hash = await jwt.sign({
+          activation_code: activation.code,
+          email,
+          time: new Date().getTime()
+        }, config.secret_key, { expiresIn: config.activation_code_expiresin });
+      activation.link = `${config.web_root_url}${config.activation_link_url}?hval=${activation.hash}`;
+      // await client.query(`INSERT INTO activation (user_id, code, hash) VALUES ($1, $2, $3) RETURNING id`, [activation.user_id, activation.code, activation.hash]);
+
     },
 
     signin: async (parent: any, params: any, context: any) => {
