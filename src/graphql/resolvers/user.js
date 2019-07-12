@@ -31,8 +31,10 @@ export default {
       const { req, res } = context
 
       const schema = Joi.object().keys({
-        // username: Joi.string().alphanum().min(3).max(30).required(),
-        login: Joi.string().email({ minDomainSegments: 2 }).required(),
+        login: Joi.alternatives().try([
+          Joi.string().email({ minDomainSegments: 2 }),
+          Joi.string().regex(/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/)
+        ]).required(),
         password: Joi.string().min(3).max(30).required(),
       }).with('login', 'password');
 
