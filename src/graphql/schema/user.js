@@ -26,6 +26,14 @@ export default gql`
     create_date: Date! @isAuth
     update_date: Date! @isAuth
   }
+  input SignupInput {
+    email: String
+    password: String!
+    username: String!
+    first_name: String!
+    last_name: String!
+    phone_number: String
+  }
   input SigninInput {
     login: String!
     password: String!
@@ -36,6 +44,7 @@ export default gql`
   }
 
   extend type Mutation {
+    signup(input: SignupInput!): Token!
     signin(input: SigninInput!): Token!
   }
 `;
