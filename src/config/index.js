@@ -18,6 +18,11 @@ export default {
   redis_host: process.env.REDIS_HOST,
   redis_port: process.env.REDIS_PORT,
   redis_pass: process.env.REDIS_PASS,
+  
+  aws_accesskey: process.env.AWS_ACCESSKEYID || "",
+  aws_secretkey: process.env.AWS_SECRETKEY || "",
+  aws_s3_bucket: process.env.AWS_S3_BUCKETNAME || "",
+  aws_smtp_region: process.env.AWS_SMTP_REGION || "",
 
   web_root_url: process.env.WEB_ROOT_URL || "",
 
@@ -30,4 +35,12 @@ export default {
   secret_key: process.env.SECRET_KEY,
   token_expiresin: process.env.TOKEN_EXPIRESIN || "30m",
   refresh_token_expiresin: process.env.REFRESH_TOKEN_EXPIRESIN || "12h",
+
+  mail_sender_name: process.env.MAIL_SENDER_NAME || "",
+  mail_sender_email: process.env.MAIL_SENDER_EMAIL || "",
+  confirm_mail_subject: process.env.CONFIRM_MAIL_SUBJECT || "PLEASE CONFIRM YOUR EMAIL",
+
+  company_name: process.env.COMPANY_NAME || "",
+  company_address: process.env.COMPANY_ADDRESS || "",
+  company_phonenumber: process.env.COMPANY_PHONENUMBER || "",
 }
