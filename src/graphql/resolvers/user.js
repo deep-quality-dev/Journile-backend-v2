@@ -74,7 +74,7 @@ export default {
         if (country) country_id = country.id;
       }
 
-      const user = await models.User.create({
+      const result = await models.User.create({
         username,
         password,
         first_name,
@@ -85,6 +85,7 @@ export default {
         country_id,
         city_id
       })
+      const user = result.get({ plain: true});
 
       const activation: any = {};
       activation.user_id = user.id;
@@ -104,6 +105,8 @@ export default {
         activation_code: activation.code,
         activation_link: activation.link
       });
+
+      return { ...user }
     },
 
     signin: async (parent: any, params: any, context: any) => {

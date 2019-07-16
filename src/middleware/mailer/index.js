@@ -2,6 +2,7 @@
 
 import AWS from 'aws-sdk';
 import handlebars from 'handlebars';
+import path from 'path';
 import fs from 'fs';
 
 import config from '../../config';
@@ -54,7 +55,7 @@ let readHTMLFile = function(path:string) :string {
 };
 
 let compileTemplate = function(data: any, templatePath: string) :any {
-  let html:string = readHTMLFile(__dirname + templatePath);
+  let html:string = readHTMLFile(path.join(__dirname, templatePath));
   let template:handlebars.TemplateDelegate<any> = handlebars.compile(html);
   let replacements:any = {
     firstname: data.first_name,

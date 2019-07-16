@@ -44,7 +44,7 @@ export default gql`
   }
 
   extend type Mutation {
-    signup(input: SignupInput!): Token!
+    signup(input: SignupInput!): User!
     signin(input: SigninInput!): Token!
   }
 `;
