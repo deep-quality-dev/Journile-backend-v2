@@ -22,7 +22,7 @@ class AwsSmtpApi {
   }
    
   async sendConfirmationEmail(data:any) :Promise<any> {
-    let htmlToSend :any = compileTemplate(data, 'templates/confirm-email.html');
+    let htmlToSend :any = compileTemplate(data, '/templates/confirm-email.html');
     let params = {
       Destination: { /* required */
         CcAddresses: [ ],

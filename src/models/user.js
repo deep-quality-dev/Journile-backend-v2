@@ -2,6 +2,14 @@
 
 import bcrypt from 'bcryptjs';
 
+
+const generatePasswordHash = function(password: string) {
+  const saltRounds = 10;
+  let salt = bcrypt.genSaltSync(saltRounds);
+  let hash = bcrypt.hashSync(password, salt);
+  return {hash, salt};
+};
+
 const user = (sequelize: any, DataTypes: any) => {
   const User = sequelize.define('user', {
     username: {
@@ -93,7 +101,6 @@ const user = (sequelize: any, DataTypes: any) => {
     },
     salt: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     status: {
       type: DataTypes.INTEGER,
@@ -123,18 +130,11 @@ const user = (sequelize: any, DataTypes: any) => {
     return user;
   };
 
-  User.beforeCreate(async user => {
-    const {hash, salt} = await user.generatePasswordHash(user.password);
+  User.beforeCreate(function(user, options) {
+    const {hash, salt} = generatePasswordHash(user.password);
     user.password = hash
     user.salt = salt
   });
-
-  User.prototype.generatePasswordHash = async function(password: string) {
-    const saltRounds = 10;
-    let salt = bcrypt.genSaltSync(saltRounds);
-    let hash = bcrypt.hashSync(password, salt);
-    return {hash, salt};
-  };
 
   User.prototype.validatePassword = function(password: string) {
     return bcrypt.compare(password, this.password);

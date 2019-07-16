@@ -9,6 +9,7 @@ import geoip from 'geoip-lite';
 import config from '../../config';
 import models from '../../models';
 import { authenticateUser } from '../../middleware/passport';
+import mailer from '../../middleware/mailer';
 
 const Op = Sequelize.Op;
 
@@ -96,6 +97,13 @@ export default {
       activation.link = `${config.web_root_url}${config.activation_link_url}?hval=${activation.hash}`;
       // await client.query(`INSERT INTO activation (user_id, code, hash) VALUES ($1, $2, $3) RETURNING id`, [activation.user_id, activation.code, activation.hash]);
 
+      await mailer.sendConfirmationEmail({
+        first_name,
+        last_name,
+        email,
+        activation_code: activation.code,
+        activation_link: activation.link
+      });
     },
 
     signin: async (parent: any, params: any, context: any) => {
