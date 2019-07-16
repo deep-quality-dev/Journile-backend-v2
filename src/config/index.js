@@ -29,8 +29,8 @@ export default {
   ssl: process.env.ENVIRONMENT == "production"? process.env.SSL : false,
 
   activation_code_digit: parseInt(process.env.ACTIVATION_CODE_DIGIT) || 6,
-  activation_code_expiresin: process.env.ACTIVATION_CODE_EXPIRESIN || "12h",
-  activation_link_url: process.env.ACTIVATION_LINK_URL || "activate/",
+  activation_code_expiresin: parseInt(process.env.ACTIVATION_CODE_EXPIRESIN) || 86400,
+  activation_link_url: process.env.ACTIVATION_LINK_URL || "activate",
 
   secret_key: process.env.SECRET_KEY,
   token_expiresin: process.env.TOKEN_EXPIRESIN || "30m",

@@ -23,6 +23,23 @@ const generateRandomCode = (digit: number) => {
   return Math.floor(start + Math.random() * 9 * start);
 }
 
+const activeUser = async (user: any) => {
+  let transaction;    
+
+  try {
+    transaction = await models.transaction();
+
+    await models.User.update({ status: 1}, { where: { id: user.id }, transaction });
+    await models.Activation.update({ status: 1 }, { where: { id: user.activation.id }, transaction });
+    await models.UserSetting.create({ user_id: user.id }, { transaction });
+
+    await transaction.commit();
+  } catch (err) {
+    if (transaction) await transaction.rollback();
+    throw err;
+  }
+}
+
 export default {
   Query: {
     me: async (parent: any, args: any, context: any ) => {
@@ -51,7 +68,7 @@ export default {
 
       try {
         Joi.assert({ email, password, username, first_name, last_name, phone_number }, schema);
-      } catch (err) { throw  new UserInputError(err.details[0].message) }
+      } catch (err) { throw new UserInputError(err.details[0].message) }
 
       const duplication = await models.User.findOne({where: { [Op.or]: [{ email} , { username }] }});
       if (duplication) {
@@ -123,7 +140,7 @@ export default {
 
       try {
         Joi.assert({ login, password }, schema);
-      } catch (err) { throw  new UserInputError(err.details[0].message) }
+      } catch (err) { throw new UserInputError(err.details[0].message) }
 
       req.body = {
         ...req.body,
@@ -151,6 +168,46 @@ export default {
 
         return { token, refresh_token };
       } catch (err) { throw err }
+    },
+
+    activate: async (parent: any, params: any, context: any) => {
+      const { input: { email, code } } = params
+      const { req, res } = context
+
+      const schema = Joi.object().keys({
+        email: Joi.string().email({ minDomainSegments: 2 }).required(),
+        code: Joi.number().required(),
+      });
+
+      try {
+        Joi.assert({ email, code }, schema);
+      } catch (err) { throw new UserInputError(err.details[0].message) }
+
+      const user = await models.User.findOne({ where: { email }, include: { model: models.Activation, as: 'activation' }, order: [ ['$activation.create_date$', 'DESC'], ], })
+
+      if (!user || !user.activation) {
+        throw new UserInputError('User not exist.')
+      }
+
+      if (user.status == 0) {
+        const sendDate = new Date(user.activation.create_date),
+            diff = (new Date()).getTime() - sendDate.getTime();
+        if (user.activation.status == 0 && diff < config.activation_code_expiresin) {
+          if (user.activation.code == code) {
+            await activeUser(user)
+            return true;
+          } else {
+            throw new UserInputError('Activation code is invalid')
+          }
+        } else {
+          await models.Activation.update({ status: 2 }, { where: { id: user.activation.id } })
+          throw new Error('Activation code is expired.')
+        }
+      } else if (user.status == 1) {
+        throw new Error('User is already active.')
+      } else {
+        throw new Error('Unable to active this user. Please contact to support.')
+      }
     },
   },
 };

@@ -38,6 +38,10 @@ export default gql`
     login: String!
     password: String!
   }
+  input ActivateInput {
+    email: String!
+    code: String!
+  }
 
   extend type Query {
     me: User! @isAuth
@@ -46,5 +50,6 @@ export default gql`
   extend type Mutation {
     signup(input: SignupInput!): User!
     signin(input: SigninInput!): Token!
+    activate(input: ActivateInput!): Boolean!
   }
 `;

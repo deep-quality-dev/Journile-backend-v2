@@ -68,6 +68,10 @@ Object.keys(models).forEach(key => {
   }
 });
 
+models.transaction = async (option: any) => {
+  return await sequelize.transaction(option)
+}
+
 export { sequelize };
 
 export default models;
