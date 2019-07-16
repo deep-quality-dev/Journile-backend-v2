@@ -96,8 +96,8 @@ export default {
           time: new Date().getTime()
         }, config.secret_key, { expiresIn: config.activation_code_expiresin });
       activation.link = `${config.web_root_url}${config.activation_link_url}?hval=${activation.hash}`;
-      // await client.query(`INSERT INTO activation (user_id, code, hash) VALUES ($1, $2, $3) RETURNING id`, [activation.user_id, activation.code, activation.hash]);
-
+      await models.Activation.create(activation);
+      
       await mailer.sendConfirmationEmail({
         first_name,
         last_name,

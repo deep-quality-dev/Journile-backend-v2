@@ -5,6 +5,7 @@ import Sequelize from 'sequelize';
 import config from '../config';
 import generateRedisModel from '../middleware/redismodel';
 
+import activation from './activation';
 import category from './category';
 import channel from './channel';
 import city from './city';
@@ -33,6 +34,7 @@ let sequelize: Sequelize = new Sequelize(
 );
 
 const models = {};
+models.Activation = activation(sequelize, Sequelize)
 models.Category = generateRedisModel(category(sequelize, Sequelize))
 models.Channel = generateRedisModel(channel(sequelize, Sequelize))
 models.City = generateRedisModel(city(sequelize, Sequelize))
@@ -53,6 +55,8 @@ models.Country.hasMany(models.Channel, { foreignKey: 'country_id' })
 models.Channel.belongsTo(models.Country, { foreignKey: 'country_id' })
 
 
+models.User.hasMany(models.Activation, { foreignKey: 'user_id' })
+models.Activation.belongsTo(models.User, { foreignKey: 'user_id' })
 models.User.hasMany(models.UserLogin, { foreignKey: 'user_id' })
 models.UserLogin.belongsTo(models.User, { foreignKey: 'user_id' })
 models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
