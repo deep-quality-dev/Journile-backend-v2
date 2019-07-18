@@ -46,7 +46,6 @@ const userLogin = (sequelize: any, DataTypes: any) => {
     update_date: DataTypes.DATE,
   }, {
     timestamps: false,
-    tableName: 'user_login',
   });
 
   UserLogin.beforeCreate(async userLogin => {

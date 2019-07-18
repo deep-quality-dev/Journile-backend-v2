@@ -35,7 +35,6 @@ const activation = (sequelize: any, DataTypes: any) => {
     update_date: DataTypes.DATE,
   }, {
     timestamps: false,
-    tableName: 'activation'
   });
 
   return Activation;
