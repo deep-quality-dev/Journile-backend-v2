@@ -6,6 +6,7 @@ import GraphQLLocation from '../types/location';
 import categoryResolvers from './category';
 import channelResolvers from './channel';
 import cityResolvers from './city';
+import contactResolvers from './contact';
 import countryResolvers from './country';
 import gammatagResolvers from './gammatag';
 import languageResolvers from './language';
@@ -23,6 +24,7 @@ export default [
   categoryResolvers,
   channelResolvers,
   cityResolvers,
+  contactResolvers,
   countryResolvers,
   gammatagResolvers,
   languageResolvers,

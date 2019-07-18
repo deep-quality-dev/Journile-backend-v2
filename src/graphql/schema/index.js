@@ -7,6 +7,7 @@ import { schemas as directiveSchemas } from '../directives';
 import categorySchema from './category';
 import channelSchema from './channel';
 import citySchema from './city';
+import contactSchema from './contact';
 import countrySchema from './country';
 import gammatagSchema from './gammatag';
 import languageSchema from './language';
@@ -32,6 +33,7 @@ export default [
   categorySchema,
   channelSchema,
   citySchema,
+  contactSchema,
   countrySchema,
   gammatagSchema,
   languageSchema,

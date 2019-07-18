@@ -9,6 +9,7 @@ import activation from './activation';
 import category from './category';
 import channel from './channel';
 import city from './city';
+import contact from './contact';
 import country from './country';
 import gammatag from './gammatag';
 import language from './language';
@@ -38,6 +39,7 @@ models.Activation = activation(sequelize, Sequelize)
 models.Category = generateRedisModel(category(sequelize, Sequelize))
 models.Channel = generateRedisModel(channel(sequelize, Sequelize))
 models.City = generateRedisModel(city(sequelize, Sequelize))
+models.Contact = generateRedisModel(contact(sequelize, Sequelize))
 models.Country = generateRedisModel(country(sequelize, Sequelize))
 models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
@@ -57,6 +59,9 @@ models.Channel.belongsTo(models.Country, { foreignKey: 'country_id' })
 
 models.User.hasMany(models.Activation, { foreignKey: 'user_id' })
 models.Activation.belongsTo(models.User, { foreignKey: 'user_id' })
+models.User.hasMany(models.Contact, { foreignKey: 'user_id' })
+models.Contact.belongsTo(models.User, { as:'user', foreignKey: 'user_id' })
+models.Contact.belongsTo(models.User, { as:'account', foreignKey: 'account_id' })
 models.User.hasMany(models.UserLogin, { foreignKey: 'user_id' })
 models.UserLogin.belongsTo(models.User, { foreignKey: 'user_id' })
 models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
