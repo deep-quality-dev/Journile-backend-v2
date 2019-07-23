@@ -29,7 +29,7 @@ passport.use('user', new LocalStrategy({
   }
 ));
 
-const authenticateUser = (req: any, res: any) => new Promise((resolve, reject) => {
+const authenticateUser = (req: any, res: any) => new Promise<any>((resolve, reject) => {
   passport.authenticate('user', { session: false }, (err, user, info) => {
     if (err) reject(err);
     resolve({ user, info });
