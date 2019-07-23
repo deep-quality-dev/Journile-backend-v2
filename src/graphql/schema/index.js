@@ -12,6 +12,7 @@ import countrySchema from './country';
 import gammatagSchema from './gammatag';
 import languageSchema from './language';
 import postSchema from './post';
+import readSchema from './read';
 import userSchema from './user';
 import userSettingSchema from './user_setting';
 
@@ -38,6 +39,7 @@ export default [
   gammatagSchema,
   languageSchema,
   postSchema,
+  readSchema,
   userSchema,
   userSettingSchema,
 ];

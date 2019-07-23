@@ -12,6 +12,7 @@ import gammatagResolvers from './gammatag';
 import languageResolvers from './language';
 import postResolvers from './post';
 import userResolvers from './user';
+import readResolvers from './read';
 import userSettingResolvers from './user_setting';
 
 const customScalarResolver = {
@@ -29,6 +30,7 @@ export default [
   gammatagResolvers,
   languageResolvers,
   postResolvers,
+  readResolvers,
   userResolvers,
   userSettingResolvers,
 ];

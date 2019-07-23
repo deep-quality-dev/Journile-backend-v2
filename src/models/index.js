@@ -14,6 +14,7 @@ import country from './country';
 import gammatag from './gammatag';
 import language from './language';
 import post from './post';
+import read from './read';
 import user from './user';
 import userLogin from './user_login';
 import userSetting from './user_setting';
@@ -44,6 +45,7 @@ models.Country = generateRedisModel(country(sequelize, Sequelize))
 models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
+models.Read = generateRedisModel(read(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
 models.UserLogin = userLogin(sequelize, Sequelize)
 models.UserSetting = generateRedisModel(userSetting(sequelize, Sequelize))
@@ -59,11 +61,17 @@ models.Channel.belongsTo(models.Country, { foreignKey: 'country_id' })
 
 models.User.hasMany(models.Activation, { foreignKey: 'user_id' })
 models.Activation.belongsTo(models.User, { foreignKey: 'user_id' })
+
 models.User.hasMany(models.Contact, { foreignKey: 'user_id' })
 models.Contact.belongsTo(models.User, { as:'user', foreignKey: 'user_id' })
 models.Contact.belongsTo(models.User, { as:'account', foreignKey: 'account_id' })
+
 models.User.hasMany(models.UserLogin, { foreignKey: 'user_id' })
 models.UserLogin.belongsTo(models.User, { foreignKey: 'user_id' })
+
+models.User.hasMany(models.Read, { foreignKey: 'user_id' })
+models.Read.belongsTo(models.User, { as:'user', foreignKey: 'user_id' })
+
 models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
 models.UserSetting.belongsTo(models.User, { foreignKey: 'user_id' })
 
