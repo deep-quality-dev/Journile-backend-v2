@@ -11,6 +11,7 @@ import contactSchema from './contact';
 import countrySchema from './country';
 import gammatagSchema from './gammatag';
 import languageSchema from './language';
+import postRateSchema from './post_rate';
 import postSchema from './post';
 import readSchema from './read';
 import userSchema from './user';
@@ -38,6 +39,7 @@ export default [
   countrySchema,
   gammatagSchema,
   languageSchema,
+  postRateSchema,
   postSchema,
   readSchema,
   userSchema,

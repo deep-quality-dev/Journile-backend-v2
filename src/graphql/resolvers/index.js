@@ -10,6 +10,7 @@ import contactResolvers from './contact';
 import countryResolvers from './country';
 import gammatagResolvers from './gammatag';
 import languageResolvers from './language';
+import postRateResolvers from './post_rate';
 import postResolvers from './post';
 import userResolvers from './user';
 import readResolvers from './read';
@@ -29,6 +30,7 @@ export default [
   countryResolvers,
   gammatagResolvers,
   languageResolvers,
+  postRateResolvers,
   postResolvers,
   readResolvers,
   userResolvers,

@@ -13,6 +13,7 @@ import contact from './contact';
 import country from './country';
 import gammatag from './gammatag';
 import language from './language';
+import postRate from './post_rate';
 import post from './post';
 import read from './read';
 import user from './user';
@@ -44,6 +45,7 @@ models.Contact = generateRedisModel(contact(sequelize, Sequelize))
 models.Country = generateRedisModel(country(sequelize, Sequelize))
 models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
+models.PostRate = generateRedisModel(postRate(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.Read = generateRedisModel(read(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
