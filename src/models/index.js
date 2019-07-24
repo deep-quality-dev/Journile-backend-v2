@@ -70,10 +70,20 @@ models.User.hasMany(models.UserLogin, { foreignKey: 'user_id' })
 models.UserLogin.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.User.hasMany(models.Read, { foreignKey: 'user_id' })
-models.Read.belongsTo(models.User, { as:'user', foreignKey: 'user_id' })
+models.Read.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
 models.UserSetting.belongsTo(models.User, { foreignKey: 'user_id' })
+
+
+models.Category.hasMany(models.Post, { foreignKey: 'category_id' })
+models.Post.belongsTo(models.Category, { foreignKey: 'category_id' })
+
+models.Channel.hasMany(models.Post, { foreignKey: 'channel_id' })
+models.Post.belongsTo(models.Channel, { foreignKey: 'channel_id' })
+
+models.User.hasMany(models.Post, { foreignKey: 'author_id' })
+models.Post.belongsTo(models.User, { as:'author', foreignKey: 'author_id' })
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {

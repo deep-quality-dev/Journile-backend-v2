@@ -11,9 +11,9 @@ export default gql`
     type: Int!
     original_url: String
     original_post_date: Date!
-    category_id: ID!
-    channel_id: ID
-    author_id: ID
+    category: Category!
+    channel: Channel
+    author: User
     gamma_tags: String
     reissued_id: ID
     language: String!
@@ -22,7 +22,23 @@ export default gql`
     update_date: Date! @isAuth
   }
 
+  input PostInput {
+    id: ID!
+    title: String!
+    description: String
+    cover_image: String
+    type: Int!
+    original_url: String
+    original_post_date: Date!
+    category_id: ID!
+    channel_id: ID
+    author_id: ID
+    gamma_tags: String
+    reissued_id: ID
+    language: String!
+  }
+
   extend type Query {
-    getPosts(date: Date, isLater: Boolean): [Post!]!
+    getPublicPosts(date: Date, isLater: Boolean): [Post!]!
   }
 `;
