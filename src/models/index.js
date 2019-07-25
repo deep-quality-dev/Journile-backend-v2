@@ -13,6 +13,7 @@ import contact from './contact';
 import country from './country';
 import gammatag from './gammatag';
 import language from './language';
+import postMedia from './post_media';
 import postRate from './post_rate';
 import post from './post';
 import read from './read';
@@ -45,6 +46,7 @@ models.Contact = generateRedisModel(contact(sequelize, Sequelize))
 models.Country = generateRedisModel(country(sequelize, Sequelize))
 models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
+models.PostMedia = generateRedisModel(postMedia(sequelize, Sequelize))
 models.PostRate = generateRedisModel(postRate(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.Read = generateRedisModel(read(sequelize, Sequelize))
@@ -86,6 +88,12 @@ models.Post.belongsTo(models.Channel, { foreignKey: 'channel_id' })
 
 models.User.hasMany(models.Post, { foreignKey: 'author_id' })
 models.Post.belongsTo(models.User, { as:'author', foreignKey: 'author_id' })
+
+models.Post.hasMany(models.PostMedia, { foreignKey: 'post_id' })
+models.PostMedia.belongsTo(models.Post, { foreignKey: 'post_id' })
+
+models.Post.hasMany(models.PostRate, { foreignKey: 'post_id' })
+models.PostRate.belongsTo(models.Post, { foreignKey: 'post_id' })
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
