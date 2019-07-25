@@ -16,7 +16,7 @@ export default {
       }
 
       const schema = Joi.object().keys({
-        post_id: Joi.string().regex(/^[\d]{1,20}$/),
+        post_id: Joi.string().regex(/^[\d]{1,20}$/).required(),
       });
 
       try {
