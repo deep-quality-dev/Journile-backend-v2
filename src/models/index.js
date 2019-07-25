@@ -14,6 +14,7 @@ import country from './country';
 import gammatag from './gammatag';
 import language from './language';
 import postComment from './post_comment';
+import postHidden from './post_hidden';
 import postMedia from './post_media';
 import postRate from './post_rate';
 import postReport from './post_report';
@@ -49,6 +50,7 @@ models.Country = generateRedisModel(country(sequelize, Sequelize))
 models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.PostComment = generateRedisModel(postComment(sequelize, Sequelize))
+models.PostHidden = generateRedisModel(postHidden(sequelize, Sequelize))
 models.PostMedia = generateRedisModel(postMedia(sequelize, Sequelize))
 models.PostRate = generateRedisModel(postRate(sequelize, Sequelize))
 models.PostReport = generateRedisModel(postReport(sequelize, Sequelize))
@@ -97,6 +99,11 @@ models.Post.hasMany(models.PostComment, { foreignKey: 'post_id' })
 models.PostComment.belongsTo(models.Post, { foreignKey: 'post_id' })
 models.User.hasMany(models.PostComment, { foreignKey: 'user_id' })
 models.PostComment.belongsTo(models.User, { foreignKey: 'user_id' })
+
+models.Post.hasMany(models.PostHidden, { foreignKey: 'post_id' })
+models.PostHidden.belongsTo(models.Post, { foreignKey: 'post_id' })
+models.User.hasMany(models.PostHidden, { foreignKey: 'user_id' })
+models.PostHidden.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.Post.hasMany(models.PostMedia, { foreignKey: 'post_id' })
 models.PostMedia.belongsTo(models.Post, { foreignKey: 'post_id' })

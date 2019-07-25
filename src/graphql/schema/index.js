@@ -12,6 +12,7 @@ import countrySchema from './country';
 import gammatagSchema from './gammatag';
 import languageSchema from './language';
 import postCommentSchema from './post_comment';
+import postHiddenSchema from './post_hidden';
 import postRateSchema from './post_rate';
 import postReportSchema from './post_report';
 import postSchema from './post';
@@ -42,6 +43,7 @@ export default [
   gammatagSchema,
   languageSchema,
   postCommentSchema,
+  postHiddenSchema,
   postRateSchema,
   postReportSchema,
   postSchema,
