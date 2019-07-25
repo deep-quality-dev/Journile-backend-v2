@@ -12,6 +12,7 @@ import gammatagResolvers from './gammatag';
 import languageResolvers from './language';
 import postCommentResolvers from './post_comment';
 import postRateResolvers from './post_rate';
+import postReportResolvers from './post_report';
 import postResolvers from './post';
 import userResolvers from './user';
 import readResolvers from './read';
@@ -33,6 +34,7 @@ export default [
   languageResolvers,
   postCommentResolvers,
   postRateResolvers,
+  postReportResolvers,
   postResolvers,
   readResolvers,
   userResolvers,

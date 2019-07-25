@@ -16,6 +16,7 @@ import language from './language';
 import postComment from './post_comment';
 import postMedia from './post_media';
 import postRate from './post_rate';
+import postReport from './post_report';
 import post from './post';
 import read from './read';
 import user from './user';
@@ -50,6 +51,7 @@ models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.PostComment = generateRedisModel(postComment(sequelize, Sequelize))
 models.PostMedia = generateRedisModel(postMedia(sequelize, Sequelize))
 models.PostRate = generateRedisModel(postRate(sequelize, Sequelize))
+models.PostReport = generateRedisModel(postReport(sequelize, Sequelize))
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.Read = generateRedisModel(read(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
@@ -101,6 +103,11 @@ models.PostMedia.belongsTo(models.Post, { foreignKey: 'post_id' })
 
 models.Post.hasMany(models.PostRate, { foreignKey: 'post_id' })
 models.PostRate.belongsTo(models.Post, { foreignKey: 'post_id' })
+
+models.Post.hasMany(models.PostReport, { foreignKey: 'post_id' })
+models.PostReport.belongsTo(models.Post, { foreignKey: 'post_id' })
+models.User.hasMany(models.PostReport, { foreignKey: 'user_id' })
+models.PostReport.belongsTo(models.User, { foreignKey: 'user_id' })
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {

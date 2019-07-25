@@ -13,6 +13,7 @@ import gammatagSchema from './gammatag';
 import languageSchema from './language';
 import postCommentSchema from './post_comment';
 import postRateSchema from './post_rate';
+import postReportSchema from './post_report';
 import postSchema from './post';
 import readSchema from './read';
 import userSchema from './user';
@@ -42,6 +43,7 @@ export default [
   languageSchema,
   postCommentSchema,
   postRateSchema,
+  postReportSchema,
   postSchema,
   readSchema,
   userSchema,
