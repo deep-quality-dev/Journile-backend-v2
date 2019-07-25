@@ -9,6 +9,9 @@ export default gql`
     user: User!
     content: String!
     reply_id: ID
+    status: Int! @isAuth
+    create_date: Date! @isAuth
+    update_date: Date! @isAuth
   }
 
   input PostCommentInput {
