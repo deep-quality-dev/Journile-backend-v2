@@ -21,6 +21,7 @@ export default gql`
 
   extend type Query {
     getChannels: [Channel]!
-    getChannel(id: ID!): Channel!
+    getHotChannels(count: Int): [Channel]!
+    getChannel(id: ID!): Channel
   }
 `;
