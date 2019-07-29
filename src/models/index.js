@@ -6,6 +6,7 @@ import config from '../config';
 import generateRedisModel from '../middleware/redismodel';
 
 import activation from './activation';
+import bookmark from './bookmark';
 import category from './category';
 import channel from './channel';
 import city from './city';
@@ -42,6 +43,7 @@ let sequelize: Sequelize = new Sequelize(
 
 const models = {};
 models.Activation = activation(sequelize, Sequelize)
+models.Bookmark = bookmark(sequelize, Sequelize)
 models.Category = generateRedisModel(category(sequelize, Sequelize))
 models.Channel = generateRedisModel(channel(sequelize, Sequelize))
 models.City = generateRedisModel(city(sequelize, Sequelize))
@@ -52,8 +54,8 @@ models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.PostComment = generateRedisModel(postComment(sequelize, Sequelize))
 models.PostHidden = generateRedisModel(postHidden(sequelize, Sequelize))
 models.PostMedia = generateRedisModel(postMedia(sequelize, Sequelize))
-models.PostRate = generateRedisModel(postRate(sequelize, Sequelize))
-models.PostReport = generateRedisModel(postReport(sequelize, Sequelize))
+models.PostRate = postRate(sequelize, Sequelize)
+models.PostReport = postReport(sequelize, Sequelize)
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.Read = generateRedisModel(read(sequelize, Sequelize))
 models.User = generateRedisModel(user(sequelize, Sequelize))
@@ -115,6 +117,11 @@ models.Post.hasMany(models.PostReport, { foreignKey: 'post_id' })
 models.PostReport.belongsTo(models.Post, { foreignKey: 'post_id' })
 models.User.hasMany(models.PostReport, { foreignKey: 'user_id' })
 models.PostReport.belongsTo(models.User, { foreignKey: 'user_id' })
+
+models.User.hasMany(models.Bookmark, { foreignKey: 'user_id' })
+models.Bookmark.belongsTo(models.User, { foreignKey: 'user_id' })
+models.Post.hasMany(models.Bookmark, { foreignKey: 'post_id' })
+models.Bookmark.belongsTo(models.Post, { foreignKey: 'post_id' })
 
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {

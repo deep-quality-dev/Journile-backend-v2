@@ -3,6 +3,7 @@
 import { GraphQLDateTime } from 'graphql-iso-date';
 import GraphQLLocation from '../types/location';
 
+import bookmarkResolvers from './bookmark';
 import categoryResolvers from './category';
 import channelResolvers from './channel';
 import cityResolvers from './city';
@@ -25,6 +26,7 @@ const customScalarResolver = {
 };
 
 export default [
+  bookmarkResolvers,
   customScalarResolver,
   categoryResolvers,
   channelResolvers,

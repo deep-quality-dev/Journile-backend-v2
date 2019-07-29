@@ -4,6 +4,7 @@ import { gql } from 'apollo-server-express';
 
 import { schemas as directiveSchemas } from '../directives';
 
+import bookmarkSchema from './bookmark';
 import categorySchema from './category';
 import channelSchema from './channel';
 import citySchema from './city';
@@ -34,6 +35,7 @@ const linkSchema = gql`
 
 export default [
   ...directiveSchemas,
+  bookmarkSchema,
   linkSchema,
   categorySchema,
   channelSchema,
