@@ -14,7 +14,7 @@ export default gql`
 
   extend type Query {
     getTrendingGammatags(count: Int): [Gammatag]!
-    getGammatag(id: ID!): Gammatag!
-    getGammatagByName(name: String!): Gammatag!
+    getGammatag(id: ID!): Gammatag
+    getGammatagByName(name: String!): Gammatag
   }
 `;

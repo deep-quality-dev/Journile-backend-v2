@@ -17,7 +17,7 @@ export default gql`
 
   extend type Query {
     getLanguages: [Language]!
-    getLanguage(id: ID!): Language!
-    getLanguageByCode(code: String!): Language!
+    getLanguage(id: ID!): Language
+    getLanguageByCode(code: String!): Language
   }
 `;

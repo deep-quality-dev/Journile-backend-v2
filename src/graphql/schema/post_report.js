@@ -20,7 +20,7 @@ export default gql`
 
   extend type Query {
     getPostReports: [PostReport!]!
-    getPostReport(id: ID!): PostReport!
+    getPostReport(id: ID!): PostReport
   }
 
   extend type Mutation {

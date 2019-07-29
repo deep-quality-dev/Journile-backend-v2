@@ -16,8 +16,8 @@ export default gql`
 
   extend type Query {
     getCountries: [Country]!
-    getCountry(id: ID!): Country!
-    getCountryByCode(code: String!): Country!
-    getCountryByDialCode(dial_code: Int!): Country!
+    getCountry(id: ID!): Country
+    getCountryByCode(code: String!): Country
+    getCountryByDialCode(dial_code: Int!): Country
   }
 `;

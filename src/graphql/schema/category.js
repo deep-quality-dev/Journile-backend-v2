@@ -14,6 +14,6 @@ export default gql`
 
   extend type Query {
     getCategories: [Category]!
-    getCategory(id: ID!): Category!
+    getCategory(id: ID!): Category
   }
 `;

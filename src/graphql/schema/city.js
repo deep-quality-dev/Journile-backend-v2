@@ -16,7 +16,7 @@ export default gql`
   extend type Query {
     getCitiesByCountryID(country_id: ID!): [City]!
     getCitiesByCountryCode(country_code: String!): [City]!
-    getCity(id: ID!): City!
+    getCity(id: ID!): City
     getCityByName(name: String!): City
   }
 `;

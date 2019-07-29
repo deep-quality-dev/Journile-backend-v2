@@ -20,7 +20,7 @@ export default gql`
 
   extend type Query {
     getPostHiddens: [PostHidden!]!
-    getPostHidden(id: ID!): PostHidden!
+    getPostHidden(id: ID!): PostHidden
   }
 
   extend type Mutation {
