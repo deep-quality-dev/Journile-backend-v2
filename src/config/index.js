@@ -38,6 +38,7 @@ export default {
 
   mail_sender_name: process.env.MAIL_SENDER_NAME || "",
   mail_sender_email: process.env.MAIL_SENDER_EMAIL || "",
+  mail_sender_email_pass: process.env.MAIL_SENDER_EMAIL_PASS || "",
   confirm_mail_subject: process.env.CONFIRM_MAIL_SUBJECT || "PLEASE CONFIRM YOUR EMAIL",
 
   company_name: process.env.COMPANY_NAME || "",
