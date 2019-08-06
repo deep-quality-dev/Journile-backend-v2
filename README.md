@@ -7,9 +7,16 @@ Journile is a smart new social media platform in the world - Say GoodBye To Fake
 - Express
 - PostgreSQL
 - Sequelize
-- GraphQL
 - Redis
-- Babel 7
+- GraphQL
+- Axios
+- Helmet
+- PM2
+- Joi
+- Passport
+- Handlbars
+- Dontenv / Lodash / Nodemailer / Moment
+- Babel 7 / Webpack
 
 ## Requirements
 - [NodeJS v8 or higher](https://nodejs.org/en/)
