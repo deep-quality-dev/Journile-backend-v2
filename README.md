@@ -12,6 +12,7 @@ Journile is a smart new social media platform in the world - Say GoodBye To Fake
 - Axios
 - Helmet
 - PM2
+- Bcrypt
 - Joi
 - Passport
 - Handlbars
