@@ -24,6 +24,8 @@ function desymbolize(o) {
     return o.map(desymbolize);
   } else if (typeof o != "object") {
     return o;
+  } else if (o instanceof Date) {
+    return o;
   } else {
     let d = Object.assign(Object.create(Object.getPrototypeOf(o)), o);
     Object.getOwnPropertySymbols(o).forEach(k => {
