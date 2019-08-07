@@ -41,6 +41,21 @@ let sequelize: Sequelize = new Sequelize(
   },
 );
 
+Sequelize.filter = (aggregation: any, filters: any, model: any) => {
+  const filterFn = Array.isArray(filters)
+    ? filters.length === 1
+      ? filters[0]
+      : Sequelize.and(...filters)
+    : filters
+
+  if (!filterFn) throw new Error('Missing filters!')
+  if (!aggregation) throw new Error('Missing aggregation!')
+
+  const query = sequelize.dialect.QueryGenerator.getWhereConditions(filterFn, model.name, model)
+  const agg = sequelize.dialect.QueryGenerator.handleSequelizeMethod(aggregation, model.name, model)
+  return Sequelize.literal(`${agg} FILTER (WHERE ${query})`)
+}
+
 const models = {};
 models.Activation = activation(sequelize, Sequelize)
 models.Bookmark = bookmark(sequelize, Sequelize)
@@ -97,23 +112,23 @@ models.Post.belongsTo(models.Channel, { foreignKey: 'channel_id' })
 models.User.hasMany(models.Post, { foreignKey: 'author_id' })
 models.Post.belongsTo(models.User, { as:'author', foreignKey: 'author_id' })
 
-models.Post.hasMany(models.PostComment, { foreignKey: 'post_id' })
+models.Post.hasMany(models.PostComment, { as:'reply', foreignKey: 'post_id' })
 models.PostComment.belongsTo(models.Post, { foreignKey: 'post_id' })
 models.User.hasMany(models.PostComment, { foreignKey: 'user_id' })
 models.PostComment.belongsTo(models.User, { foreignKey: 'user_id' })
 
-models.Post.hasMany(models.PostHidden, { foreignKey: 'post_id' })
+models.Post.hasMany(models.PostHidden, { as: 'hidden', foreignKey: 'post_id' })
 models.PostHidden.belongsTo(models.Post, { foreignKey: 'post_id' })
 models.User.hasMany(models.PostHidden, { foreignKey: 'user_id' })
 models.PostHidden.belongsTo(models.User, { foreignKey: 'user_id' })
 
-models.Post.hasMany(models.PostMedia, { foreignKey: 'post_id' })
+models.Post.hasMany(models.PostMedia, { as:'media', foreignKey: 'post_id' })
 models.PostMedia.belongsTo(models.Post, { foreignKey: 'post_id' })
 
-models.Post.hasMany(models.PostRate, { foreignKey: 'post_id' })
+models.Post.hasMany(models.PostRate, { as:'rate', foreignKey: 'post_id' })
 models.PostRate.belongsTo(models.Post, { foreignKey: 'post_id' })
 
-models.Post.hasMany(models.PostReport, { foreignKey: 'post_id' })
+models.Post.hasMany(models.PostReport, { as: 'report', foreignKey: 'post_id' })
 models.PostReport.belongsTo(models.Post, { foreignKey: 'post_id' })
 models.User.hasMany(models.PostReport, { foreignKey: 'user_id' })
 models.PostReport.belongsTo(models.User, { foreignKey: 'user_id' })

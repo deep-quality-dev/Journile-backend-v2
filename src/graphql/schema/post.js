@@ -3,6 +3,25 @@
 import { gql } from 'apollo-server-express';
 
 export default gql`
+  type PostRateDetail {
+    like: Int!
+    dislike: Int!
+    status: Int! @isAuth
+  }
+
+  type PostMediaDetail {
+    images: [String!]
+    videos: [String!]
+  }
+
+  type ReplyDetail {
+    count: Int!
+  }
+
+  type PostBookmarkDetail {
+    status: Int!
+  }
+
   type Post {
     id: ID!
     title: String!
@@ -14,9 +33,13 @@ export default gql`
     category: Category!
     channel: Channel
     author: User
+    media: PostMediaDetail!
     gamma_tags: String
     reissued_id: ID
     language: String!
+    rate: PostRateDetail!
+    reply: ReplyDetail!
+    bookmark: PostBookmarkDetail! @isAuth
     status: Int! @isAuth
     create_date: Date! @isAuth
     update_date: Date! @isAuth
@@ -40,5 +63,6 @@ export default gql`
 
   extend type Query {
     getPublicPosts(date: Date, isLater: Boolean): [Post!]!
+    getPrivatePosts(date: Date, isLater: Boolean): [Post!]! @isAuth
   }
 `;

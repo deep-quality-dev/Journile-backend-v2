@@ -3,33 +3,33 @@
 const POST_LIMIT_COUNT = 20
 
 const getPostQuerySelect = (isPrivate: boolean = false) => {
-  return `SELECT po.*, CONCAT(u.first_name, ' ', u.last_name) AS user_name, u.username AS user_nick, u.email AS user_email, u.photo AS user_photo,
-    u.level AS user_level, ch.name AS channel_name, ch.username AS channel_nick, ch.email AS channel_email, ch.logo AS channel_logo,
-    ca.name AS category_name, ch.cover_image AS channel_cover, u.cover_image AS user_cover, 
-    COUNT(DISTINCT ra.id) FILTER (WHERE ra.status = 1) AS like, 
-    COUNT(DISTINCT ra.id) FILTER (WHERE ra.status = 2) AS dislike, 
-    COUNT(DISTINCT co.id) FILTER (WHERE co.status = 0) AS reply,
-    ${isPrivate? `COALESCE(ram.status, 0)`: '0'} AS rate_status, 
-    ${isPrivate? `COALESCE(bo.status, 0)`: '0'} AS bookmark_status, 
-    ARRAY_AGG(me.url) FILTER (WHERE me.type=0) AS images, 
-    ARRAY_AGG(me.url) FILTER (WHERE me.type=1) AS videos 
-    FROM posts po 
-    LEFT JOIN users         AS u    ON u.id = po.author_id 
-    LEFT JOIN channels      AS ch   ON ch.id = po.channel_id 
-    LEFT JOIN categories    AS ca   ON ca.id = po.category_id 
-    LEFT JOIN post_rates    AS ra   ON ra.post_id = po.id 
-    LEFT JOIN post_comments AS co   ON co.post_id = po.id 
-    LEFT JOIN post_medias   AS me   ON me.post_id = po.id 
-    ${isPrivate? `LEFT JOIN post_rates    AS ram  ON (ram.post_id = po.id AND ram.user_id = ($1)) 
-    LEFT JOIN bookmarks     AS bo   ON (bo.post_id = po.id AND bo.user_id = ($1)) 
-    LEFT JOIN post_hiddens  AS hid  ON (hid.post_id = po.id AND hid.user_id = ($1)) 
-    LEFT JOIN post_reports  AS rep  ON (rep.post_id = po.id AND rep.user_id = ($1))` : ''}
+  return `SELECT "post".*, 
+    "user"."id" AS "author.id", "user"."username" AS "author.username", "user"."first_name" AS "author.first_name", "user"."last_name" AS "author.last_name", "user"."email" AS "author.email", "user"."phone_number" AS "author.phone_number", "user"."signup_type" AS "author.signup_type", "user"."level" AS "author.level", "user"."photo" AS "author.photo", "user"."cover_image" AS "author.cover_image", "user"."site_url" AS "author.site_url", "user"."country_id" AS "author.country_id", "user"."city_id" AS "author.city_id", "user"."description" AS "author.description", "user"."salt" AS "author.salt", "user"."status" AS "author.status", "user"."create_date" AS "author.create_date", "user"."update_date" AS "author.update_date", 
+    "channel"."id" AS "channel.id", "channel"."name" AS "channel.name", "channel"."username" AS "channel.username", "channel"."email" AS "channel.email", "channel"."logo" AS "channel.logo", "channel"."cover_image" AS "channel.cover_image", "channel"."site_url" AS "channel.site_url", "channel"."country_id" AS "channel.country_id", "channel"."type" AS "channel.type", "channel"."description" AS "channel.description", "channel"."status" AS "channel.status", "channel"."create_date" AS "channel.create_date", "channel"."update_date" AS "channel.update_date", 
+    "category"."id" AS "category.id", "category"."name" AS "category.name", "category"."tags" AS "category.tags", "category"."status" AS "category.status", "category"."create_date" AS "category.create_date", "category"."update_date" AS "category.update_date", 
+    ARRAY_AGG("media"."url") FILTER (WHERE "media"."type"=0) AS "media.images", 
+    ARRAY_AGG("media"."url") FILTER (WHERE "media"."type"=1) AS "media.videos", 
+    COUNT(DISTINCT "rate"."id") FILTER (WHERE "rate"."status" = 1) AS "rate.like", 
+    COUNT(DISTINCT "rate"."id") FILTER (WHERE "rate"."status" = 2) AS "rate.dislike", 
+    ${isPrivate? `AVG("rate"."status") FILTER (WHERE "rate"."user_id" = ($1))`: '0'} AS "rate.status", 
+    COUNT(DISTINCT "comment"."id") FILTER (WHERE "comment"."status" = 0) AS "reply.count", 
+    ${isPrivate? `COALESCE("bookmark"."status", 0)`: '0'} AS "bookmark.status" 
+    FROM "posts" AS "post" 
+    LEFT OUTER JOIN "users" AS "user" ON "user"."id" = "post"."author_id" 
+    LEFT OUTER JOIN "channels" AS "channel" ON "channel"."id" = "post"."channel_id" 
+    LEFT OUTER JOIN "categories" AS "category" ON "category"."id" = "post"."category_id" 
+    LEFT OUTER JOIN "post_medias" AS "media" ON "media"."post_id" = "post"."id" 
+    LEFT OUTER JOIN "post_rates" AS "rate" ON "rate"."post_id" = "post"."id" 
+    LEFT OUTER JOIN "post_comments" AS "comment" ON "comment"."post_id" = "post"."id" 
+    ${isPrivate? `LEFT OUTER JOIN "bookmarks" AS "bookmark" ON "bookmark"."post_id" = "post"."id" AND "bookmark"."user_id" = ($1)) 
+    LEFT OUTER JOIN "post_hiddens" AS "hidden" ON "hidden"."post_id" = "post"."id" AND "hidden"."user_id" = ($1)) 
+    LEFT OUTER JOIN "post_reports" AS "report" ON "report"."post_id" = "post"."id" AND "report"."user_id" = ($1))` : ''}
   `;
 }
 
 const getPostQueryWhere = (isPrivate: boolean = false, date: ?string, isLater: ?boolean, status: ?number) => {
   return isPrivate? '':
-    `WHERE ch.type = 0 ${date? " AND po.original_post_date <= '"+date+"'" : ' '} ${ status != null ? ' AND po.status = '+status+' ' : ' ' }`
+    `WHERE "channel"."type" = 0 ${date? `AND "post"."original_post_date" <= '`+date+`' ` : ' '} ${ status != null ? `AND "post"."status" = `+status+` ` : ' ' }`
 }
 
 const post = (sequelize: any, DataTypes: any) => {
@@ -101,12 +101,13 @@ const post = (sequelize: any, DataTypes: any) => {
   Post.findPublicPosts = async (date: ?string, isLater: ?boolean, status: ?number) => {
     let query = getPostQuerySelect();
     query += getPostQueryWhere(false, date, isLater)
-    query += `GROUP BY po.id, u.id, ch.id, ca.id 
-      ORDER BY po.original_post_date DESC 
+    query += `GROUP BY "post"."id", "user"."id", "channel"."id", "category"."id" 
+      ORDER BY "post"."original_post_date" DESC 
       LIMIT ${POST_LIMIT_COUNT} `
 
     try {
-      const posts = await sequelize.query(query, { type: sequelize.QueryTypes.SELECT});
+      const posts = await sequelize.query(query, { nest: true, type: sequelize.QueryTypes.SELECT });
+      console.log('posts', posts)
 
       return posts
     } catch (err) {
