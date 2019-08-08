@@ -44,4 +44,7 @@ export default {
   company_name: process.env.COMPANY_NAME || "",
   company_address: process.env.COMPANY_ADDRESS || "",
   company_phonenumber: process.env.COMPANY_PHONENUMBER || "",
+
+  scraper_secret_key: process.env.SCRAPER_SECRET_KEY,
+  scraper_token_expiresin: process.env.SCRAPER_TOKEN_EXPIRESIN || "30m",
 }
