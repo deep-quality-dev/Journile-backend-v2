@@ -18,6 +18,7 @@ import postRateSchema from './post_rate';
 import postReportSchema from './post_report';
 import postSchema from './post';
 import readSchema from './read';
+import scraperSchema from './scraper';
 import userSchema from './user';
 import userSettingSchema from './user_setting';
 import uploadSchema from './upload';
@@ -51,6 +52,7 @@ export default [
   postReportSchema,
   postSchema,
   readSchema,
+  scraperSchema,
   userSchema,
   userSettingSchema,
   uploadSchema,

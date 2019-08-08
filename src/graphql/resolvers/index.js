@@ -16,8 +16,9 @@ import postHiddenResolvers from './post_hidden';
 import postRateResolvers from './post_rate';
 import postReportResolvers from './post_report';
 import postResolvers from './post';
-import userResolvers from './user';
 import readResolvers from './read';
+import scraperResolvers from './scraper';
+import userResolvers from './user';
 import userSettingResolvers from './user_setting';
 import uploadResolvers from './upload';
 
@@ -27,8 +28,8 @@ const customScalarResolver = {
 };
 
 export default [
-  bookmarkResolvers,
   customScalarResolver,
+  bookmarkResolvers,
   categoryResolvers,
   channelResolvers,
   cityResolvers,
@@ -42,6 +43,7 @@ export default [
   postReportResolvers,
   postResolvers,
   readResolvers,
+  scraperResolvers,
   userResolvers,
   userSettingResolvers,
   uploadResolvers,

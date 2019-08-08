@@ -21,6 +21,7 @@ import postRate from './post_rate';
 import postReport from './post_report';
 import post from './post';
 import read from './read';
+import scraper from './scraper';
 import user from './user';
 import userLogin from './user_login';
 import userSetting from './user_setting';
@@ -73,6 +74,7 @@ models.PostRate = postRate(sequelize, Sequelize)
 models.PostReport = postReport(sequelize, Sequelize)
 models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.Read = generateRedisModel(read(sequelize, Sequelize))
+models.Scraper = scraper(sequelize, Sequelize)
 models.User = generateRedisModel(user(sequelize, Sequelize))
 models.UserLogin = userLogin(sequelize, Sequelize)
 models.UserSetting = generateRedisModel(userSetting(sequelize, Sequelize))
