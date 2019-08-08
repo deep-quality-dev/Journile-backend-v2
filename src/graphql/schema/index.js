@@ -20,6 +20,7 @@ import postSchema from './post';
 import readSchema from './read';
 import userSchema from './user';
 import userSettingSchema from './user_setting';
+import uploadSchema from './upload';
 
 const linkSchema = gql`
   scalar Date
@@ -52,4 +53,5 @@ export default [
   readSchema,
   userSchema,
   userSettingSchema,
+  uploadSchema,
 ];

@@ -19,6 +19,7 @@ import postResolvers from './post';
 import userResolvers from './user';
 import readResolvers from './read';
 import userSettingResolvers from './user_setting';
+import uploadResolvers from './upload';
 
 const customScalarResolver = {
   Date: GraphQLDateTime,
@@ -43,4 +44,5 @@ export default [
   readResolvers,
   userResolvers,
   userSettingResolvers,
+  uploadResolvers,
 ];
