@@ -3,6 +3,7 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import fs from 'fs';
+import path from "path";
 import https from 'https';
 import http from 'http';
 import helmet from 'helmet';
@@ -13,6 +14,7 @@ import typeDefs from './graphql/schema';
 import resolvers from './graphql/resolvers';
 import schemaDirectives from './graphql/directives';
 import { sequelize } from './models';
+import mediaRouter from './route/media';
 
 const apollo = new ApolloServer({
   typeDefs,
@@ -29,6 +31,8 @@ const apollo = new ApolloServer({
 
 const app = express()
 app.use(passport.initialize())
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/public/media', mediaRouter);
 app.use(helmet())
 
 apollo.applyMiddleware({ app })
