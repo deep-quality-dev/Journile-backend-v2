@@ -1,7 +1,6 @@
 import AWS from 'aws-sdk';
 import axios from 'axios';
 import Url from 'url-parse';
-import moment from 'moment';
 import jwt from 'jsonwebtoken';
 import uuid from 'uuid/v4';
 
@@ -13,7 +12,6 @@ let s3: AWS.S3 = new AWS.S3({
   secretAccessKey: config.aws_secretkey,
 });
 
-
 class S3FileUploader {
   async uploadImageFromUrl(url: string) {
     try
@@ -21,11 +19,7 @@ class S3FileUploader {
       if(!url || typeof url != "string") throw new Error("Missing parameter \'url\'.");
       
       const parsed = new Url(url);
-      let extension = "png", query = {};
-      if (parsed && parsed.query) {
-        query = qs.parse(parsed.query)
-      }
-
+      let extension = "png";
       let fileName: string = parsed.pathname.substring(parsed.pathname.lastIndexOf("/")+1);
 
       if (fileName.lastIndexOf(".") > -1) {
@@ -35,10 +29,9 @@ class S3FileUploader {
       const rand = uuid();
       const token = jwt.sign(rand, config.secret_key);
       const fileKey = `${rand}.${extension}`;
-      const fileUrl = `${config.server_root_url}public/media?name=${fileKey}&sk=${token}&da=${moment().format()}`;
-      console.log('fileUrl', fileUrl)
+      const fileUrl = `${config.server_root_url}public/media?name=${fileKey}&sk=${token}&da=${new Date().getTime()}`;
 
-      let response = await axios.get(url).then( async result => {
+      let response = await axios({ method: 'get', url, responseType: 'arraybuffer' }).then( async result => {
         return await s3.putObject({
           ACL: "public-read",
           Bucket: config.aws_s3_bucket,
@@ -50,7 +43,6 @@ class S3FileUploader {
       .catch( err => {
         throw err;
       });
-        console.log('response of image', response)
       
       return fileUrl;
     } catch(ex){
