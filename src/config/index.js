@@ -24,6 +24,7 @@ export default {
   aws_s3_bucket: process.env.AWS_S3_BUCKETNAME || "",
   aws_smtp_region: process.env.AWS_SMTP_REGION || "",
 
+  server_root_url: process.env.SERVER_ROOT_URL || "",
   web_root_url: process.env.WEB_ROOT_URL || "",
 
   ssl: process.env.ENVIRONMENT == "production"? process.env.SSL : false,

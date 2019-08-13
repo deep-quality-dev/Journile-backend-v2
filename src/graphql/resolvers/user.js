@@ -24,7 +24,7 @@ const generateRandomCode = (digit: number) => {
 }
 
 const activeUser = async (user: any) => {
-  let transaction;    
+  let transaction;
 
   try {
     transaction = await models.transaction();

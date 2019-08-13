@@ -1,5 +1,7 @@
 /* @flow */
 
+import fileUploader from '../middleware/uploader';
+
 const postMedia = (sequelize: any, DataTypes: any) => {
   const PostMedia = sequelize.define('post_media', {
     post_id: {
@@ -36,6 +38,35 @@ const postMedia = (sequelize: any, DataTypes: any) => {
   }, {
     timestamps: false,
   });
+
+  PostMedia.uploadMedia = async function (post_id: number, type: number, urls: string[], transaction: any) {
+    if(!urls || urls.length < 1) throw new Error ("Parameter 'urls' is missed")
+    
+    let fileUrls = [], insertData = [], filePath:string = "";
+
+    try {
+      for(let i = 0; i < urls.length; i++) {
+        filePath ='';
+        if (type == 0) {
+          filePath = await fileUploader.uploadImageFromUrl(urls[i]);
+        } else {
+          filePath = urls[i]; //await fileUploader.uploadVideoFromUrl(urls[i]);
+        }
+        fileUrls.push(filePath);
+        insertData.push ({ post_id, type, url: filePath });
+      }
+      const option = transaction? { transaction } : {}
+      await PostMedia.bulkCreate(insertData, option)
+    }
+    catch(err){
+      console.error(" Error on save media: " + err);
+      throw err;
+    }
+
+    return {
+      urls: fileUrls,
+    }
+  }
 
   return PostMedia;
 };
