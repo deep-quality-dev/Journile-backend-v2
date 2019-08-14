@@ -2,6 +2,8 @@
 
 import Sequelize from 'sequelize';
 
+import logger from '../middleware/logger';
+
 const Op = Sequelize.Op;
 
 const userLogin = (sequelize: any, DataTypes: any) => {
@@ -52,7 +54,7 @@ const userLogin = (sequelize: any, DataTypes: any) => {
     try {
       await UserLogin.expireOldLogins(userLogin.user_id, userLogin.login_type);
     } catch (e) {
-      console.error(`Error on expiring old refresh tokens: ${e}`)
+      logger.error(`Error on expiring old refresh tokens: ${e}`)
     }
 
     userLogin.login = new Date().toLocaleString()

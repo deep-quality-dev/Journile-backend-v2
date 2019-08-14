@@ -108,7 +108,6 @@ export default function generateRedisModel(model: any, options: any = {}) {
       }
     }
 
-    // console.log('From DB');
     const result = await model[`org_${method}`](...args);
     let toCache;
     if (!result) {

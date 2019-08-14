@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import uuid from 'uuid/v4';
 
 import config from '../../config';
+import logger from '../logger';
 
 
 let s3: AWS.S3 = new AWS.S3({
@@ -46,7 +47,7 @@ class S3FileUploader {
       
       return fileUrl;
     } catch(ex){
-      console.log("Error on utility.S3FileUpload.uploadImageFromUrl: " + ex);
+      logger.error("Error on utility.S3FileUpload.uploadImageFromUrl: " + ex);
       throw ex;
     }
   };

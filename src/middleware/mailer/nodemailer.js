@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 
 import config from '../../config';
+import logger from '../../middleware/logger';
 
 class NodemailerSmtpApi {
   transporter: any;
@@ -33,11 +34,11 @@ class NodemailerSmtpApi {
       html: htmlToSend // html body
     });
     
-    console.log("Message sent: %s", responseFromEmail.messageId);
+    logger.info("Message sent: %s", responseFromEmail.messageId);
     // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
     // Preview only available when sending through an Ethereal account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(responseFromEmail));
+    logger.info("Preview URL: %s", nodemailer.getTestMessageUrl(responseFromEmail));
     // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
     
     return responseFromEmail;
@@ -49,7 +50,7 @@ let readHTMLFile = function(path:string) :string {
     let file = fs.readFileSync(path, {encoding: 'utf-8'});
     return file;
   } catch(ex) {
-    console.log(ex);
+    logger.error(ex);
     throw ex;
   }
 };

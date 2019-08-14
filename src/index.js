@@ -15,6 +15,7 @@ import resolvers from './graphql/resolvers';
 import schemaDirectives from './graphql/directives';
 import { sequelize } from './models';
 import mediaRouter from './route/media';
+import logger from './middleware/logger';
 
 const apollo = new ApolloServer({
   typeDefs,
@@ -56,10 +57,10 @@ if (config.ssl) {
 apollo.installSubscriptionHandlers(server)
 
 sequelize.sync({force: false}).then(() => {
-  console.log('Connected to database')
+  logger.info('Connected to database')
 
   server.listen({ port: config.port }, () =>
-    console.log(
+    logger.info(
       '🚀 Server ready at',
       `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${apollo.graphqlPath}`
     )

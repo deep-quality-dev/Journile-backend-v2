@@ -2,7 +2,8 @@ import { Router, Request, Response, NextFunction } from "express";
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
-import config from "../config";
+import config from '../config';
+import logger from '../middleware/logger';
 
 const router = Router();
 
@@ -40,7 +41,7 @@ router.route("/")
 			}
 			axios({ method: 'get', url, responseType: 'stream' }).then(result => result.data.pipe(res));
 		} catch (err) {
-			console.log("Error on router.public.media.get" + err);
+			logger.error("Error on router.public.media.get" + err);
 			res.status(500).send("Error getting media.");
 		}
 	});

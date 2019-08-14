@@ -59,12 +59,7 @@ const postMedia = (sequelize: any, DataTypes: any) => {
       await PostMedia.bulkCreate(insertData, option)
     }
     catch(err){
-      console.error(" Error on save media: " + err);
       throw err;
-    }
-
-    return {
-      urls: fileUrls,
     }
   }
 

@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 
 import config from '../../config';
+import logger from '../../middleware/logger';
 
 class AwsSmtpApi {
   ses: AWS.SES;
@@ -49,7 +50,7 @@ let readHTMLFile = function(path:string) :string {
     let file = fs.readFileSync(path, {encoding: 'utf-8'});
     return file;
   } catch(ex) {
-    console.log(ex);
+    logger.error(ex);
     throw ex;
   }
 };

@@ -81,7 +81,6 @@ export default {
       
       let city_id, country_id, geo = geoip.lookup(clientip);
       if (geo) {
-        console.log('geo location track: ', geo);
         const city_name = geo.city || "Unknown";
         const city = await models.City.findOne({ where: { name: { [Op.like]: `%${city_name}%` } }});
         if (city) city_id = city.id;

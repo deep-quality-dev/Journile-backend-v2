@@ -106,10 +106,7 @@ const post = (sequelize: any, DataTypes: any) => {
       LIMIT ${POST_LIMIT_COUNT} `
 
     try {
-      const posts = await sequelize.query(query, { nest: true, type: sequelize.QueryTypes.SELECT });
-      console.log('posts', posts)
-
-      return posts
+      return await sequelize.query(query, { nest: true, type: sequelize.QueryTypes.SELECT });
     } catch (err) {
       throw err
     }

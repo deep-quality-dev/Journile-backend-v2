@@ -4,6 +4,7 @@ import redis from 'redis';
 import bluebird from "bluebird";
 
 import config from '../../config';
+import logger from '../logger';
 
 // make node_redis promise compatible
 bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -16,10 +17,10 @@ const client = redis.createClient({
   password : config.redis_pass,
 });
 client.on('connect', () => {
-  console.log(`Connected to redis`);
+  logger.info(`Connected to redis`);
 });
 client.on('error', err => {
-  console.log(`Error: ${err}`);
+  logger.info(`Error: ${err}`);
 });
 
 export default client;
