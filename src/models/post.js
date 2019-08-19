@@ -1,5 +1,8 @@
 /* @flow */
 
+import _ from 'lodash';
+
+
 const POST_LIMIT_COUNT = 20
 
 const getPostQuerySelect = (isPrivate: boolean = false) => {
@@ -111,6 +114,17 @@ const post = (sequelize: any, DataTypes: any) => {
       throw err
     }
   }
+
+  Post.afterFind(function(results, options) {
+      _.each(results, result => {
+        if (result.channel && !result.channel.id) {
+          result.channel = null;
+        }
+        if (result.author && !result.author.id) {
+          result.author = null;
+        }
+      })
+  });
 
   return Post;
 };

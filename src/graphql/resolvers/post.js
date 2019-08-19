@@ -28,6 +28,8 @@ const SpiderMaxContinuousLimit = 500;
 function getQueryOption(info: any, user: any) {
   let option: any = {
     subQuery: false,
+    nest: true,
+    raw: true,
     include: [
       { model: models.Category, as: 'category' },
       { model: models.Channel, as: 'channel' },
@@ -35,18 +37,18 @@ function getQueryOption(info: any, user: any) {
       { model: models.PostMedia, as: 'media', attributes: [
         [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.col("media.url")), { "$media.type$": 0 }, models.PostMedia), "images" ],
         [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.col("media.url")), { "$media.type$": 1 }, models.PostMedia), "videos" ],
-      ] },
+      ], noPrimaryKey: true },
       { model: models.PostRate, as: 'rate', attributes: [
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 1 }, models.PostRate), "like" ],
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 2 }, models.PostMedia), "dislike" ],
-        [ user? Sequelize.filter(Sequelize.fn("AVG", Sequelize.col("rate.status")), { "$rate.user_id$": user.id }, models.PostMedia): 0, "status" ]
-      ] },
+        [ user? Sequelize.filter(Sequelize.fn("AVG", Sequelize.col("rate.status")), { "$rate.user_id$": user.id }, models.PostMedia): Sequelize.literal(0), "status" ]
+      ], noPrimaryKey: true },
       { model: models.PostComment, as: 'reply', attributes: [
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("reply.id")), { "$reply.status$": 0 }, models.PostComment), "count" ],
-      ] },
+      ], noPrimaryKey: true },
       { model: models.Bookmark, attributes: [
-        [ user? Sequelize.fn('COALESCE', Sequelize.col("bookmark.status"), 0): 0, "status" ],
-      ] },
+        [ user? Sequelize.filter(Sequelize.fn('COALESCE', Sequelize.col("bookmark.status"), 0), { "$bookmark.user_id$": user.id }, models.Bookmark): Sequelize.literal(0), "status" ],
+      ], noPrimaryKey: true },
     ],
     order: [['original_post_date', 'DESC']],
     limit: 20,
@@ -109,7 +111,7 @@ export default {
       if (!user) {
         return [];
       }
-      let option = getQueryOption(info)
+      let option = getQueryOption(info, user)
 
       option.where = { "$channel.type$": 0 }
       if (date) {
