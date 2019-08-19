@@ -2,10 +2,28 @@
 
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
 import Sequelize from 'sequelize';
+import franc from "franc";
+import langs from "langs";
+import Joi from '@hapi/joi';
 
 import models from '../../models';
+import fileUploader from '../../middleware/uploader';
+import logger from '../../middleware/logger';
 
 const Op = Sequelize.Op;
+
+
+const PostType = {
+  Article: 0,
+  Video: 1,
+  Photo: 2,
+  Location: 3,
+  MultiMedia: 4,
+};
+
+const GammaTagLimitLength = 20;
+const GammaTagLimitCount = 5;
+const SpiderMaxContinuousLimit = 500;
 
 function getQueryOption(info: any, user: any) {
   let option: any = {
@@ -44,9 +62,30 @@ function getQueryOption(info: any, user: any) {
   return option
 }
 
-function getPrivateQueryOption(info: any, user_id: number) {
-  let option = getQueryOption(info)
+function languageFinder(description: string) {
+  const detailsWithoutHtmlTags = description.replace(/<\/?[^>]+(>|$)/g, "");
+  const lang3 = franc(detailsWithoutHtmlTags);
+  let language = langs.where("3", lang3);
+  if (language && language["1"]) {
+    return language["1"];
+  } else {
+    return "en";
+  }
+}
 
+function filterGammatags(gammatags: string[]) {
+  gammatags = gammatags || []
+  for (var i=0; i<gammatags.length; i++) {
+    var tag = gammatags[i];
+    tag = tag.replace(/[^a-zA-Z\d]/g, "").toLowerCase();
+    gammatags[i] = tag;
+  }
+  
+  gammatags = gammatags.filter(function(item, pos, self) {
+    return item.length < GammaTagLimitLength && self.indexOf(item) == pos;
+  });
+
+  return gammatags.slice(0, GammaTagLimitCount);
 }
 
 export default {
@@ -81,6 +120,140 @@ export default {
     },
   },
 
-  // Mutation: {
-  // },
+  Mutation: {
+    userPost: async (parent: any, params: any, context: any) => {
+      let { input: {
+          title,
+          description,
+          cover_image,
+          type,
+          original_url,
+          original_post_date,
+          category_id,
+          gamma_tags,
+          images,
+          videos,
+          reissued_id,
+          language
+        }
+      } = params;
+
+      const schema = Joi.object().keys({
+        title: Joi.string().min(3).max(256),
+        cover_image: Joi.string().uri(),
+        original_url: Joi.string().uri(),
+        gamma_tags: Joi.array().items(Joi.string()).required(),
+        images: Joi.array().items(Joi.string().uri()),
+        videos: Joi.array().items(Joi.string().uri()),
+      });
+
+      try {
+        Joi.assert({ title, cover_image, original_url, gamma_tags, images, videos }, schema);
+      } catch (err) { throw new UserInputError(err.details[0].message) }
+
+      try {
+        const duplication = await models.Post.findAll({ where: { title: { [Op.like]: `%${title}%` }, original_url: { [Op.like]: `%${original_url}%` } } });
+        logger.info('duplication', duplication)
+
+        if (duplication.length > 0) {
+          throw new UserInputError('Duplicated post');
+        }
+
+        if (!language) {
+          language = languageFinder(description);
+        }
+
+      } catch (err) { throw err }
+    },
+    
+    scraperPost: async (parent: any, params: any, context: any) => {
+      const { scraper } = context
+      if (!scraper) {
+        return null;
+      }
+
+      let { input: {
+          title,
+          description,
+          cover_image,
+          type,
+          original_url,
+          original_post_date,
+          category_id,
+          gamma_tags,
+          images,
+          videos,
+        }
+      } = params;
+
+      const schema = Joi.object().keys({
+        title: Joi.string().min(3).max(256),
+        cover_image: Joi.string().uri(),
+        original_url: Joi.string().uri(),
+        gamma_tags: Joi.array().items(Joi.string()).required(),
+        images: Joi.array().items(Joi.string().uri()),
+        videos: Joi.array().items(Joi.string().uri()),
+      });
+
+      try {
+        Joi.assert({ title, cover_image, original_url, gamma_tags, images, videos }, schema);
+      } catch (err) { throw new UserInputError(err.details[0].message) }
+
+      let language, transaction;
+      try {
+        // const duplication = await models.Post.findAll({ where: { title: { [Op.like]: `%${title}%` }, original_url: { [Op.like]: `%${original_url}%` } } });
+
+        // if (duplication.length > 0) {
+        //   throw new UserInputError('Duplicated post');
+        // }
+
+        language = languageFinder(description);
+        gamma_tags = [scraper.username].concat(gamma_tags);
+        gamma_tags = filterGammatags(gamma_tags);
+      } catch (err) { throw err }
+
+      try {
+        transaction = await models.transaction();
+
+        logger.info('--------------------------------------------------------');
+        let cover_image_url = null
+        if (type != PostType.Photo && cover_image) {
+          cover_image_url = await fileUploader.uploadImageFromUrl(cover_image);
+        }
+
+        const result = await models.Post.create({
+          title,
+          description,
+          cover_image: cover_image_url,
+          type,
+          original_url,
+          original_post_date,
+          category_id,
+          channel_id: scraper.channel_id,
+          gamma_tags: gamma_tags.join(','),
+          language,
+        }, { transaction })
+        const post_id = result.id
+
+        logger.info('videos', videos);
+        if (videos && videos.length > 0) {
+          await models.PostMedia.uploadMedia(post_id, 1, videos, transaction);
+        }
+        if (images && images.length > 0) {
+          await models.PostMedia.uploadMedia(post_id, 0, images, transaction);
+        }
+        // await savePolls(data, client, postId);
+
+        // await gammatagClient.rateGammatags(data.gamma_tags, client);
+
+        await transaction.commit();
+        logger.info('--------------------------------------------------------');
+        
+        return post_id;
+      } catch (err) {
+        if (transaction) await transaction.rollback();
+        throw err;
+      }
+    },
+  },
 };

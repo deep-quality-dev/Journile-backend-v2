@@ -46,7 +46,6 @@ export default gql`
   }
 
   input PostInput {
-    id: ID!
     title: String!
     description: String
     cover_image: String
@@ -54,15 +53,20 @@ export default gql`
     original_url: String
     original_post_date: Date!
     category_id: ID!
-    channel_id: ID
-    author_id: ID
-    gamma_tags: String
+    gamma_tags: [String!]!
+    images: [String!]
+    videos: [String!]
     reissued_id: ID
-    language: String!
+    language: String
   }
 
   extend type Query {
     getPublicPosts(date: Date, isLater: Boolean): [Post!]!
     getPrivatePosts(date: Date, isLater: Boolean): [Post!]! @isAuth
+  }
+
+  extend type Mutation {
+    userPost(input: PostInput!): ID! @isAuth
+    scraperPost(input: PostInput!): ID! @isScraperAuth
   }
 `;
