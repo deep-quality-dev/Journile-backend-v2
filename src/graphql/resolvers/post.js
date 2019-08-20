@@ -41,13 +41,10 @@ function getQueryOption(info: any, user: any) {
       { model: models.PostRate, as: 'rate', attributes: [
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 1 }, models.PostRate), "like" ],
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 2 }, models.PostMedia), "dislike" ],
-        [ user? Sequelize.filter(Sequelize.fn("AVG", Sequelize.col("rate.status")), { "$rate.user_id$": user.id }, models.PostMedia): Sequelize.literal(0), "status" ]
+        [ user? Sequelize.fn('COALESCE', Sequelize.filter(Sequelize.fn("MAX", Sequelize.col("rate.status")), { "$rate.user_id$": user.id }, models.PostMedia), 0): Sequelize.literal(0), "status" ]
       ], noPrimaryKey: true },
       { model: models.PostComment, as: 'reply', attributes: [
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("reply.id")), { "$reply.status$": 0 }, models.PostComment), "count" ],
-      ], noPrimaryKey: true },
-      { model: models.Bookmark, attributes: [
-        [ user? Sequelize.filter(Sequelize.fn('COALESCE', Sequelize.col("bookmark.status"), 0), { "$bookmark.user_id$": user.id }, models.Bookmark): Sequelize.literal(0), "status" ],
       ], noPrimaryKey: true },
     ],
     order: [['original_post_date', 'DESC']],
@@ -56,9 +53,16 @@ function getQueryOption(info: any, user: any) {
   }
 
   if (user) {
-    option.include.push({ model: models.Bookmark })
-    option.include.push({ model: models.PostHidden, as: 'hidden' })
-    option.include.push({ model: models.PostReport, as: 'report' })
+    option.attributes = {
+      include: [
+        [ Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("bookmark.status")), 0), "bookmark" ],
+        [ Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("hidden.status")), 0), 'hidden' ],
+        [ Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("report.status")), 0), 'report' ],
+      ]
+    }
+    option.include.push({ model: models.Bookmark, as: 'bookmark', required: false, attributes: [], where: { "$bookmark.user_id$": user.id }  })
+    option.include.push({ model: models.PostHidden, as: 'hidden', required: false, attributes: [], where: { "$hidden.user_id$": user.id } })
+    option.include.push({ model: models.PostReport, as: 'report', required: false, attributes: [], where: { "$report.user_id$": user.id } })
   }
 
   return option
@@ -101,7 +105,6 @@ export default {
         option["where"]["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
       }
 
-      // return await models.Post.findPublicPosts(date, isLater);
       return await models.Post.findAll({ ...option });
     },
     

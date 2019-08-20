@@ -18,10 +18,6 @@ export default gql`
     count: Int!
   }
 
-  type PostBookmarkDetail {
-    status: Int!
-  }
-
   type Post {
     id: ID!
     title: String!
@@ -39,7 +35,9 @@ export default gql`
     language: String!
     rate: PostRateDetail!
     reply: ReplyDetail!
-    bookmark: PostBookmarkDetail! @isAuth
+    bookmark: Int! @isAuth
+    hidden: Int! @isAuth
+    report: Int! @isAuth
     status: Int! @isAuth
     create_date: Date! @isAuth
     update_date: Date! @isAuth

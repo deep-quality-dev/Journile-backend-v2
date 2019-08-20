@@ -135,9 +135,9 @@ models.PostReport.belongsTo(models.Post, { foreignKey: 'post_id' })
 models.User.hasMany(models.PostReport, { foreignKey: 'user_id' })
 models.PostReport.belongsTo(models.User, { foreignKey: 'user_id' })
 
-models.User.hasMany(models.Bookmark, { foreignKey: 'user_id' })
+models.User.hasMany(models.Bookmark, { as: 'bookmark', foreignKey: 'user_id' })
 models.Bookmark.belongsTo(models.User, { foreignKey: 'user_id' })
-models.Post.hasMany(models.Bookmark, { foreignKey: 'post_id' })
+models.Post.hasMany(models.Bookmark, { as: 'bookmark', foreignKey: 'post_id' })
 models.Bookmark.belongsTo(models.Post, { foreignKey: 'post_id' })
 
 Object.keys(models).forEach(key => {
