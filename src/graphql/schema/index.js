@@ -22,6 +22,7 @@ import scraperSchema from './scraper';
 import userSchema from './user';
 import userSettingSchema from './user_setting';
 import uploadSchema from './upload';
+import weatherSchema from './weather';
 
 const linkSchema = gql`
   scalar Date
@@ -56,4 +57,5 @@ export default [
   userSchema,
   userSettingSchema,
   uploadSchema,
+  weatherSchema,
 ];

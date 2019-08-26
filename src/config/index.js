@@ -48,4 +48,6 @@ export default {
 
   scraper_secret_key: process.env.SCRAPER_SECRET_KEY,
   scraper_token_expiresin: process.env.SCRAPER_TOKEN_EXPIRESIN || "30m",
+
+  weather_api_key: process.env.WEATHER_API_KEY || "",
 }

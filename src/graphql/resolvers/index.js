@@ -21,6 +21,7 @@ import scraperResolvers from './scraper';
 import userResolvers from './user';
 import userSettingResolvers from './user_setting';
 import uploadResolvers from './upload';
+import weatherdResolvers from './weather';
 
 const customScalarResolver = {
   Date: GraphQLDateTime,
@@ -47,4 +48,5 @@ export default [
   userResolvers,
   userSettingResolvers,
   uploadResolvers,
+  weatherdResolvers,
 ];
