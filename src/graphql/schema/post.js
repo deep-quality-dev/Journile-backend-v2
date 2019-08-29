@@ -61,6 +61,7 @@ export default gql`
   extend type Query {
     getPublicPosts(date: Date, isLater: Boolean): [Post!]!
     getPrivatePosts(date: Date, isLater: Boolean): [Post!]! @isAuth
+    getHotTopics(count: Int): [Post!]!
   }
 
   extend type Mutation {

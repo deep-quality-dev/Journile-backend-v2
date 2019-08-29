@@ -123,6 +123,18 @@ export default {
 
       return await models.Post.findAll({ ...option });
     },
+
+    getHotTopics: async (parent: any, params: any, context: any, info: any) => {
+      const { count } = params
+
+      let option = getQueryOption(info)
+
+      option.order = [Sequelize.literal('"rate.like" DESC'), ['original_post_date', 'DESC']]
+      option.limit = count || 4
+      option.where = { "status": 0 }
+
+      return await models.Post.findAll({ ...option });
+    },
   },
 
   Mutation: {
