@@ -44,8 +44,8 @@ if (config.ssl) {
   // Assumes certificates are in .ssl folder from package root. Make sure the files are secured.
   server = https.createServer(
     {
-      key: fs.readFileSync(`./ssl/server.key`),
-      cert: fs.readFileSync(`./ssl/server.crt`)
+      // key: fs.readFileSync(`./ssl/server.key`),
+      // cert: fs.readFileSync(`./ssl/server.crt`)
     },
     app
   )
@@ -59,10 +59,9 @@ apollo.installSubscriptionHandlers(server)
 sequelize.sync({force: false}).then(() => {
   logger.info('Connected to database')
 
-  server.listen({ port: config.port }, () =>
+  app.listen({ port: config.port }, () =>
     logger.info(
-      '🚀 Server ready at',
-      `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${apollo.graphqlPath}`
+      `🚀 Server ready at: http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${apollo.graphqlPath}`
     )
   )
 })
