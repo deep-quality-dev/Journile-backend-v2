@@ -48,7 +48,11 @@ export default {
         return null;
       }
 
-      return await models.User.findByPk(user.id);
+      const option = {
+        include: [{ model: models.Country, as: 'country' }, { model: models.City, as: 'city' }],
+      }
+
+      return await models.User.findByPk(user.id, option);
     },
   },
 

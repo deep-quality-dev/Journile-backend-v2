@@ -140,6 +140,12 @@ models.Bookmark.belongsTo(models.User, { foreignKey: 'user_id' })
 models.Post.hasMany(models.Bookmark, { as: 'bookmark', foreignKey: 'post_id' })
 models.Bookmark.belongsTo(models.Post, { foreignKey: 'post_id' })
 
+models.City.hasMany(models.User, { foreignKey: 'city_id' })
+models.User.belongsTo(models.City, { as: 'city', foreignKey: 'city_id' })
+
+models.Country.hasMany(models.User, { foreignKey: 'country_id' })
+models.User.belongsTo(models.Country, { as: 'country', foreignKey: 'country_id' })
+
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
     models[key].associate(models);

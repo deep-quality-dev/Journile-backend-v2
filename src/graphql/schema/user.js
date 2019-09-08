@@ -19,8 +19,8 @@ export default gql`
     photo: String
     cover_image: String
     site_url: String
-    country_id: Int
-    city_id: Int
+    country: Country
+    city: City
     description: String
     status: Int! @isAuth
     create_date: Date! @isAuth
