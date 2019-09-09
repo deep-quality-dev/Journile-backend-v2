@@ -32,7 +32,7 @@ const apollo = new ApolloServer({
 
 const app = express()
 app.use(passport.initialize())
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/public', express.static(path.join(__dirname, '../public')));
 app.use('/public/media', mediaRouter);
 app.use(helmet())
 
