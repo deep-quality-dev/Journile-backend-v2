@@ -8,6 +8,7 @@ import config from '../../config';
 
 export const schema = gql`
   directive @isAuth on FIELD_DEFINITION
+  directive @checkAuth on FIELD_DEFINITION
 `;
 
 const verifyPromise = (token: string) => new Promise((resolve, reject) => {
@@ -58,6 +59,26 @@ export class IsAuthDirective extends SchemaDirectiveVisitor {
 			} else {
 				throw new AuthenticationError('You must be the authenticated user to get this information');
 			}
+		};
+	}
+}
+
+export class CheckAuthDirective extends SchemaDirectiveVisitor {
+	visitFieldDefinition(field: any) {
+		const { resolve = defaultFieldResolver } = field;
+		field.resolve = async function (...args) {
+			const [ , params, context ] = args;
+			const { authorization } = context;
+			if (authorization) {
+				try {
+					const decoded = await checkAuth(authorization);
+					context.user = decoded;
+				} catch(err) {
+					// nothing need to handle
+				}
+			}
+			const result = await resolve.apply(this, args);
+			return result;
 		};
 	}
 }
