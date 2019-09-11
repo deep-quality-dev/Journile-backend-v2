@@ -6,7 +6,7 @@ export default gql`
   type PostRateDetail {
     like: Int!
     dislike: Int!
-    status: Int! @isAuth
+    status: Int!
   }
 
   type PostMediaDetail {
@@ -35,9 +35,9 @@ export default gql`
     language: String!
     rate: PostRateDetail!
     reply: ReplyDetail!
-    bookmark: Int! @isAuth
-    hidden: Int! @isAuth
-    report: Int! @isAuth
+    bookmark: Int!
+    hidden: Int!
+    report: Int!
     status: Int! @isAuth
     create_date: Date! @isAuth
     update_date: Date! @isAuth
@@ -59,8 +59,7 @@ export default gql`
   }
 
   extend type Query {
-    getPublicPosts(date: Date, isLater: Boolean): [Post!]!
-    getPrivatePosts(date: Date, isLater: Boolean): [Post!]! @isAuth
+    getPosts(date: Date, isLater: Boolean): [Post!]! @checkAuth
     getHotTopics(count: Int): [Post!]!
   }
 

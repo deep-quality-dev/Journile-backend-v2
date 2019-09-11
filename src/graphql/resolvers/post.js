@@ -30,6 +30,13 @@ function getQueryOption(info: any, user: any) {
     subQuery: false,
     nest: true,
     raw: true,
+    attributes: {
+      include: [
+        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("bookmark.status")), 0): Sequelize.literal(0), "bookmark" ],
+        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("hidden.status")), 0): Sequelize.literal(0), 'hidden' ],
+        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("report.status")), 0): Sequelize.literal(0), 'report' ],
+      ],
+    },
     include: [
       { model: models.Category, as: 'category' },
       { model: models.Channel, as: 'channel' },
@@ -40,8 +47,8 @@ function getQueryOption(info: any, user: any) {
       ], noPrimaryKey: true },
       { model: models.PostRate, as: 'rate', attributes: [
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 1 }, models.PostRate), "like" ],
-        [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 2 }, models.PostMedia), "dislike" ],
-        [ user? Sequelize.fn('COALESCE', Sequelize.filter(Sequelize.fn("MAX", Sequelize.col("rate.status")), { "$rate.user_id$": user.id }, models.PostMedia), 0): Sequelize.literal(0), "status" ]
+        [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 2 }, models.PostRate), "dislike" ],
+        [ user? Sequelize.fn('COALESCE', Sequelize.filter(Sequelize.fn("MAX", Sequelize.col("rate.status")), { "$rate.user_id$": user.id }, models.PostRate), 0): Sequelize.literal(0), "status" ]
       ], noPrimaryKey: true },
       { model: models.PostComment, as: 'reply', attributes: [
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("reply.id")), { "$reply.status$": 0 }, models.PostComment), "count" ],
@@ -53,13 +60,6 @@ function getQueryOption(info: any, user: any) {
   }
 
   if (user) {
-    option.attributes = {
-      include: [
-        [ Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("bookmark.status")), 0), "bookmark" ],
-        [ Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("hidden.status")), 0), 'hidden' ],
-        [ Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("report.status")), 0), 'report' ],
-      ]
-    }
     option.include.push({ model: models.Bookmark, as: 'bookmark', required: false, attributes: [], where: { "$bookmark.user_id$": user.id }  })
     option.include.push({ model: models.PostHidden, as: 'hidden', required: false, attributes: [], where: { "$hidden.user_id$": user.id } })
     option.include.push({ model: models.PostReport, as: 'report', required: false, attributes: [], where: { "$report.user_id$": user.id } })
@@ -96,29 +96,18 @@ function filterGammatags(gammatags: string[]) {
 
 export default {
   Query: {
-    getPublicPosts: async (parent: any, params: any, context: any, info: any) => {
-      const { date, isLater } = params
-      let option = getQueryOption(info)
-
-      option.where = { "$channel.type$": 0 }
-      if (date) {
-        option["where"]["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
-      }
-
-      return await models.Post.findAll({ ...option });
-    },
-    
-    getPrivatePosts: async (parent: any, params: any, context: any, info: any) => {
+    getPosts: async (parent: any, params: any, context: any, info: any) => {
       const { date, isLater } = params
       const { user } = context
-      if (!user) {
-        return [];
-      }
       let option = getQueryOption(info, user)
 
-      option.where = { "$channel.type$": 0 }
-      if (date) {
-        option.where["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
+      if (user) {
+        // private query
+      } else {
+        option.where = { "$channel.type$": 0 }
+        if (date) {
+          option["where"]["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
+        }
       }
 
       return await models.Post.findAll({ ...option });
