@@ -101,14 +101,17 @@ export default {
       const { user } = context
       let option = getQueryOption(info, user)
 
+      let where: any = {};
       if (user) {
         // private query
       } else {
-        option.where = { "$channel.type$": 0 }
-        if (date) {
-          option["where"]["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
-        }
+        where = { "$channel.type$": 0 }
       }
+
+      if (date) {
+        where["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
+      }
+      option.where = where;
 
       return await models.Post.findAll({ ...option });
     },
@@ -121,6 +124,21 @@ export default {
       option.order = [Sequelize.literal('"rate.like" DESC'), ['original_post_date', 'DESC']]
       option.limit = count || 4
       option.where = { "status": 0 }
+
+      return await models.Post.findAll({ ...option });
+    },
+    
+    getUserPosts: async (parent: any, params: any, context: any, info: any) => {
+      const { user_id, date, isLater } = params
+      const { user } = context
+      let option = getQueryOption(info, user)
+
+      let where: any = { "author_id": user_id };
+      
+      if (date) {
+        where["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
+      }
+      option.where = where;
 
       return await models.Post.findAll({ ...option });
     },
