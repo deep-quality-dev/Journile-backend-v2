@@ -54,6 +54,48 @@ export default {
 
       return await models.User.findByPk(user.id, option);
     },
+
+    getUserByUsername: async (parent: any, args: any, context: any ) => {
+      const { username } = args
+
+      const option = {
+        include: [{ model: models.Country, as: 'country' }, { model: models.City, as: 'city' }],
+        where: { username },
+      }
+
+      return await models.User.findOne(option);
+    },
+
+    getUserActivity: async (parent: any, args: any, context: any ) => {
+      const { username } = args
+
+      const option = {
+        nest: true,
+        raw: true,
+        attributes: [
+          'id', 'username', 'email',
+          [ Sequelize.fn('COUNT', Sequelize.col("posts.id")), "posts" ],
+          [ Sequelize.fn('COUNT', Sequelize.col("reading.id")), 'reading' ],
+          [ Sequelize.fn('COUNT', Sequelize.col("reader.id")), 'readers' ],
+          [ Sequelize.fn('COUNT', Sequelize.col("comment.id")), 'comments' ],
+          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 1 }, models.PostRate), "like" ],
+          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 2 }, models.PostRate), "dislike" ],
+          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("posts.id")), { "$posts.reissued_id$": { [Op.ne]: null } }, models.PostRate), "reissue" ],
+          // [ Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("report.status")), 0), 'report' ],
+        ],
+        include: [
+          { model: models.Post, required: false, attributes: [] },
+          { model: models.Read, as: 'reading', required: false, attributes: [] },
+          { model: models.Read, as: 'reader', required: false, attributes: [] },
+          { model: models.PostComment, as: 'comment', required: false, attributes: [] },
+          { model: models.PostRate, as: 'rate', required: false, attributes: [] },
+        ],
+        group: ["user.id"],
+        where: { username },
+      }
+
+      return await models.User.findOne(option);
+    },
   },
 
   Mutation: {

@@ -23,9 +23,19 @@ export default gql`
     city: City
     description: String
     status: Int! @isAuth
-    create_date: Date! @isAuth
+    create_date: Date!
     update_date: Date! @isAuth
   }
+  type UserActivity {
+    posts: Int!
+    reading: Int!
+    readers: Int!
+    comments: Int!
+    like: Int!
+    dislike: Int!
+    reissue: Int!
+  }
+
   input SignupInput {
     email: String
     password: String!
@@ -45,6 +55,8 @@ export default gql`
 
   extend type Query {
     me: User! @isAuth
+    getUserByUsername(username: String!): User
+    getUserActivity(username: String!): UserActivity
   }
 
   extend type Mutation {

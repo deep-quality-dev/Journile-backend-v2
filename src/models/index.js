@@ -98,7 +98,8 @@ models.Contact.belongsTo(models.User, { as:'account', foreignKey: 'account_id' }
 models.User.hasMany(models.UserLogin, { foreignKey: 'user_id' })
 models.UserLogin.belongsTo(models.User, { foreignKey: 'user_id' })
 
-models.User.hasMany(models.Read, { foreignKey: 'user_id' })
+models.User.hasMany(models.Read, { as: 'reading', foreignKey: 'user_id' })
+models.User.hasMany(models.Read, { as: 'reader', foreignKey: 'reading_id' })
 models.Read.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
@@ -116,7 +117,7 @@ models.Post.belongsTo(models.User, { as:'author', foreignKey: 'author_id' })
 
 models.Post.hasMany(models.PostComment, { as:'reply', foreignKey: 'post_id' })
 models.PostComment.belongsTo(models.Post, { foreignKey: 'post_id' })
-models.User.hasMany(models.PostComment, { foreignKey: 'user_id' })
+models.User.hasMany(models.PostComment, { as: 'comment',  foreignKey: 'user_id' })
 models.PostComment.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.Post.hasMany(models.PostHidden, { as: 'hidden', foreignKey: 'post_id' })
@@ -129,6 +130,8 @@ models.PostMedia.belongsTo(models.Post, { foreignKey: 'post_id' })
 
 models.Post.hasMany(models.PostRate, { as:'rate', foreignKey: 'post_id' })
 models.PostRate.belongsTo(models.Post, { foreignKey: 'post_id' })
+models.User.hasMany(models.PostRate, { as: 'rate', foreignKey: 'user_id' })
+models.PostRate.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.Post.hasMany(models.PostReport, { as: 'report', foreignKey: 'post_id' })
 models.PostReport.belongsTo(models.Post, { foreignKey: 'post_id' })
