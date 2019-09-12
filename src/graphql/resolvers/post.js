@@ -60,7 +60,7 @@ function getQueryOption(info: any, user: any) {
   }
 
   if (user) {
-    option.include.push({ model: models.Bookmark, as: 'bookmark', required: false, attributes: [], where: { "$bookmark.user_id$": user.id }  })
+    option.include.push({ model: models.Bookmark, as: 'bookmark', required: false, attributes: [], where: { "$bookmark.user_id$": user.id } })
     option.include.push({ model: models.PostHidden, as: 'hidden', required: false, attributes: [], where: { "$hidden.user_id$": user.id } })
     option.include.push({ model: models.PostReport, as: 'report', required: false, attributes: [], where: { "$report.user_id$": user.id } })
   }

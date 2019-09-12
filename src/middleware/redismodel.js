@@ -112,13 +112,22 @@ export default function generateRedisModel(model: any, options: any = {}) {
     let toCache;
     if (!result) {
       return result;
-    } if (Array.isArray(result) || result.rows || typeof result === 'number') {
+    }
+    
+    if (Array.isArray(result) || result.rows || typeof result === 'number') {
       // Array for findAll, result.rows for findAndCountAll, typeof number for count/max/sum/etc
       toCache = result;
     } else if (result.toString().includes(('[object SequelizeInstance'))) {
       toCache = result;
     } else {
-      throw new Error(`Unkown result type: ${typeof result}`);
+      let queryOptions;
+      if (args.length > 0) queryOptions = args.slice(-1)[0];
+
+      if (queryOptions && !!queryOptions.raw) {
+        toCache = result;
+      } else {
+        throw new Error(`Unkown result type: ${typeof result}`);
+      }
     }
 
     redisClient.set(cacheKey, stringify(toCache));
