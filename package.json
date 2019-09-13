@@ -43,6 +43,7 @@
     "graphql": "^14.4.1",
     "graphql-fields-list": "^2.1.2",
     "graphql-iso-date": "^3.6.1",
+    "graphql-s2s": "^0.20.2",
     "handlebars": "^4.1.2",
     "helmet": "^3.18.0",
     "http": "0.0.0",
