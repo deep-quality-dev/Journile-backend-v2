@@ -88,7 +88,7 @@ models.Country.hasMany(models.Channel, { foreignKey: 'country_id' })
 models.Channel.belongsTo(models.Country, { foreignKey: 'country_id' })
 
 
-models.User.hasMany(models.Activation, { foreignKey: 'user_id' })
+models.User.hasMany(models.Activation, { as: 'activation', foreignKey: 'user_id' })
 models.Activation.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.User.hasMany(models.Contact, { foreignKey: 'user_id' })

@@ -63,5 +63,6 @@ export default gql`
     signup(input: SignupInput!): User!
     signin(input: SigninInput!): Token!
     activate(input: ActivateInput!): Boolean!
+    requestActivation(email: String!) Boolean!
   }
 `;
