@@ -61,7 +61,9 @@ export default graphqls2s.transpileSchema(`
     getUserByUsername(username: String!): User
     getUserActivity(username: String!): UserActivity
     getUserReading(user_id: ID!, offset: Int = 0): [UserWithReading]! @checkAuth
+    getUserRecentReading(user_id: ID!, count: Int = 5): [User]!
     getUserReaders(user_id: ID!, offset: Int = 0): [UserWithReading]! @checkAuth
+    getUserRecentReaders(user_id: ID!, count: Int = 5): [User]!
   }
 
   extend type Mutation {

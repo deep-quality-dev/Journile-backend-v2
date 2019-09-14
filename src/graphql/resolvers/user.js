@@ -156,6 +156,26 @@ export default {
       return await models.User.findAll(option);
     },
     
+    getUserRecentReading: async (parent: any, params: any, context: any, info: any) => {
+      const { user_id, count } = params
+      
+      const option = {
+        subQuery: false,
+        nest: true,
+        include: [
+          { model: models.Country, as: 'country', required: false },
+          { model: models.City, as: 'city', required: false },
+          { model: models.Read, as: 'reader', attributes: [], where: { status: 1 } },
+        ],
+        order: [ [{ model: models.Read, as: 'reader' }, 'id', 'DESC'], ],
+        limit: count,
+        group: [ 'user.id', 'country.id', 'city.id', 'reader.id' ],
+        where: { '$reader.user_id$': user_id },
+      }
+
+      return await models.User.findAll(option);
+    },
+    
     getUserReaders: async (parent: any, params: any, context: any, info: any) => {
       const { user_id, offset } = params
       const { user } = context
@@ -183,6 +203,26 @@ export default {
 
       if (user) {
         option.include.push({ model: models.Read, as: 'myRead', attributes: [], where: { user_id: user.id } });
+      }
+
+      return await models.User.findAll(option);
+    },
+    
+    getUserRecentReaders: async (parent: any, params: any, context: any, info: any) => {
+      const { user_id, count } = params
+      
+      const option = {
+        subQuery: false,
+        nest: true,
+        include: [
+          { model: models.Country, as: 'country', required: false },
+          { model: models.City, as: 'city', required: false },
+          { model: models.Read, as: 'reading', attributes: [], where: { status: 1 } },
+        ],
+        order: [ [{ model: models.Read, as: 'reading' }, 'id', 'DESC'], ],
+        limit: count,
+        group: [ 'user.id', 'country.id', 'city.id', 'reading.id' ],
+        where: { '$reading.reading_id$': user_id },
       }
 
       return await models.User.findAll(option);
