@@ -15,8 +15,7 @@ export default {
 
   Mutation: {
     readUser: async (parent: any, params: any, context: any) => {
-      let { user_id, read } = params
-      read = read || true;
+      let { user_id, reading } = params
       const { user } = context
 
       if (user.id == user_id) {
@@ -29,7 +28,7 @@ export default {
         throw new UserInputError('User not exist.')
       }
 
-      await models.Read.upsert({user_id: user.id, reading_id: user_id, type: 0, status: read? 1: 0}, { where: {user_id: user.id, reading_id: user_id, type: 0 } })
+      await models.Read.upsert({user_id: user.id, reading_id: user_id, type: 0, status: reading}, { where: {user_id: user.id, reading_id: user_id, type: 0 } })
 
       return true;
     }
