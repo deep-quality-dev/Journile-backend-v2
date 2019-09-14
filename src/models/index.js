@@ -57,6 +57,20 @@ Sequelize.filter = (aggregation: any, filters: any, model: any) => {
   return Sequelize.literal(`${agg} FILTER (WHERE ${query})`)
 }
 
+Sequelize.Model.upsert = function (values: any, options: any) {
+  const Model = this;
+  return Model
+    .findOne(options)
+    .then(function(obj) {
+      if(obj) { // update
+        return obj.update(values);
+      }
+      else { // insert
+        return Model.create(values);
+      }
+    })
+}
+
 const models = {};
 models.Activation = activation(sequelize, Sequelize)
 models.Bookmark = bookmark(sequelize, Sequelize)
