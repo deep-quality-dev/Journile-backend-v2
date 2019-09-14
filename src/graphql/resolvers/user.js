@@ -40,6 +40,34 @@ const activeUser = async (user: any) => {
   }
 }
 
+const sendActivationMail = async (user: any) => {
+  const {
+    id,
+    first_name,
+    last_name,
+    email,
+  } = user;
+
+  const activation: any = {};
+  activation.user_id = id;
+  activation.code = generateRandomCode(config.activation_code_digit);
+  activation.hash = await jwt.sign({
+      activation_code: activation.code,
+      email,
+      time: new Date().getTime()
+    }, config.secret_key, { expiresIn: config.activation_code_expiresin });
+  activation.link = `${config.web_root_url}${config.activation_link_url}?hval=${activation.hash}`;
+  await models.Activation.create(activation);
+  
+  await mailer.sendConfirmationEmail({
+    first_name,
+    last_name,
+    email,
+    activation_code: activation.code,
+    activation_link: activation.link
+  });
+}
+
 export default {
   Query: {
     me: async (parent: any, args: any, context: any ) => {
@@ -149,24 +177,7 @@ export default {
       })
       const user = result.get({ plain: true});
 
-      const activation: any = {};
-      activation.user_id = user.id;
-      activation.code = generateRandomCode(config.activation_code_digit);
-      activation.hash = await jwt.sign({
-          activation_code: activation.code,
-          email,
-          time: new Date().getTime()
-        }, config.secret_key, { expiresIn: config.activation_code_expiresin });
-      activation.link = `${config.web_root_url}${config.activation_link_url}?hval=${activation.hash}`;
-      await models.Activation.create(activation);
-      
-      await mailer.sendConfirmationEmail({
-        first_name,
-        last_name,
-        email,
-        activation_code: activation.code,
-        activation_link: activation.link
-      });
+      await sendActivationMail(user);
 
       return { ...user }
     },
@@ -202,6 +213,12 @@ export default {
           );
         }
 
+        if (user.status >= 2) {
+          throw new AuthenticationError('This account is blocked, please contact to support.');
+        } else if (user.status < 1) {
+          throw new AuthenticationError('This account isn\'t active. Please check our confirm email in your mailbox or resend.');
+        }
+
         const token = await createToken(user, config.token_expiresin)
         const refresh_token = await createToken(user, config.refresh_token_expiresin)
 
@@ -217,18 +234,27 @@ export default {
 
     activate: async (parent: any, params: any, context: any) => {
       const { input: { email, code } } = params
-      const { req, res } = context
 
       const schema = Joi.object().keys({
         email: Joi.string().email({ minDomainSegments: 2 }).required(),
-        code: Joi.number().required(),
+        code: Joi.string().required(),
       });
 
       try {
         Joi.assert({ email, code }, schema);
       } catch (err) { throw new UserInputError(err.details[0].message) }
 
-      const user = await models.User.findOne({ where: { email }, include: { model: models.Activation, as: 'activation' }, order: [ ['$activation.create_date$', 'DESC'], ], })
+      const user = await models.User.findOne({
+        nest: true,
+        raw: true,
+        include: [
+          { model: models.Country, as: 'country' },
+          { model: models.City, as: 'city' },
+          { model: models.Activation, as: 'activation' },
+        ],
+        order: [ [models.Activation, 'create_date', 'DESC'], ],
+        where: { email }
+      })
 
       if (!user || !user.activation) {
         throw new UserInputError('User not exist.')
@@ -237,7 +263,7 @@ export default {
       if (user.status == 0) {
         const sendDate = new Date(user.activation.create_date),
             diff = (new Date()).getTime() - sendDate.getTime();
-        if (user.activation.status == 0 && diff < config.activation_code_expiresin) {
+        if (user.activation.status == 0 && diff / 1000 < config.activation_code_expiresin) {
           if (user.activation.code == code) {
             await activeUser(user)
             return true;
@@ -254,5 +280,27 @@ export default {
         throw new Error('Unable to active this user. Please contact to support.')
       }
     },
+
+    requestActivation: async (parent: any, params: any, context: any) => {
+      const { email } = params
+
+      const schema = Joi.object().keys({
+        email: Joi.string().email({ minDomainSegments: 2 }).required(),
+      });
+
+      try {
+        Joi.assert({ email }, schema);
+      } catch (err) { throw new UserInputError(err.details[0].message) }
+
+      const user = await models.User.findOne({ where: { email } })
+
+      if (!user) {
+        throw new UserInputError('User not exist.')
+      }
+
+      await sendActivationMail(user);
+
+      return true;
+    }
   },
 };
