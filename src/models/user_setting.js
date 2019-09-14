@@ -90,7 +90,7 @@ const userSetting = (sequelize: any, DataTypes: any) => {
       unique: true,
       defaultValue: 'en',
       validate: {
-        isNumeric: true
+        notEmpty: true
       },
     },
     monetize_content: {
@@ -138,7 +138,7 @@ const userSetting = (sequelize: any, DataTypes: any) => {
       unique: true,
       defaultValue: 'dark',
       validate: {
-        isNumeric: true
+        notEmpty: true
       },
     },
     status: {
