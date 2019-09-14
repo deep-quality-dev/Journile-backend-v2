@@ -103,13 +103,12 @@ export default {
         attributes: [
           'id', 'username', 'email',
           [ Sequelize.fn('COUNT', Sequelize.col("posts.id")), "posts" ],
-          [ Sequelize.fn('COUNT', Sequelize.col("reading.id")), 'reading' ],
+          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("reading.id")), { "$reading.type$": 0 }, models.PostRate), 'reading' ],
           [ Sequelize.fn('COUNT', Sequelize.col("reader.id")), 'readers' ],
           [ Sequelize.fn('COUNT', Sequelize.col("comment.id")), 'comments' ],
           [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 1 }, models.PostRate), "like" ],
           [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 2 }, models.PostRate), "dislike" ],
           [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("posts.id")), { "$posts.reissued_id$": { [Op.ne]: null } }, models.PostRate), "reissue" ],
-          // [ Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("report.status")), 0), 'report' ],
         ],
         include: [
           { model: models.Post, required: false, attributes: [] },
@@ -123,6 +122,70 @@ export default {
       }
 
       return await models.User.findOne(option);
+    },
+    
+    getUserReading: async (parent: any, params: any, context: any, info: any) => {
+      const { user_id, offset } = params
+      const { user } = context
+      
+      const option = {
+        subQuery: false,
+        nest: true,
+        raw: true,
+        attributes: {
+          include: [
+            [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col('myRead.status')), 0): Sequelize.literal(0), 'reading' ],
+          ]
+        },
+        include: [
+          { model: models.Country, as: 'country', required: false },
+          { model: models.City, as: 'city', required: false },
+          { model: models.Read, as: 'reader', attributes: [], where: { status: 1 } },
+        ],
+        order: [ [{ model: models.Read, as: 'reader' }, 'id', 'DESC'], ],
+        offset,
+        limit: 20,
+        group: [ 'user.id', 'country.id', 'city.id', 'reader.id' ],
+        where: { '$reader.user_id$': user_id },
+      }
+
+      if (user) {
+        option.include.push({ model: models.Read, as: 'myRead', attributes: [], required: false, where: { user_id: user.id } });
+      }
+
+      return await models.User.findAll(option);
+    },
+    
+    getUserReaders: async (parent: any, params: any, context: any, info: any) => {
+      const { user_id, offset } = params
+      const { user } = context
+      
+      const option = {
+        subQuery: false,
+        nest: true,
+        raw: true,
+        attributes: {
+          include: [
+            [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col('myRead.status')), 0): Sequelize.literal(0), 'reading' ],
+          ]
+        },
+        include: [
+          { model: models.Country, as: 'country' },
+          { model: models.City, as: 'city' },
+          { model: models.Read, as: 'reading', attributes: [], where: { status: 1 } },
+        ],
+        order: [ [{ model: models.Read, as: 'reading' }, 'id', 'DESC'], ],
+        offset,
+        limit: 20,
+        group: [ 'user.id', 'country.id', 'city.id', 'reading.id' ],
+        where: { '$reading.reading_id$': user_id },
+      }
+
+      if (user) {
+        option.include.push({ model: models.Read, as: 'myRead', attributes: [], where: { user_id: user.id } });
+      }
+
+      return await models.User.findAll(option);
     },
   },
 

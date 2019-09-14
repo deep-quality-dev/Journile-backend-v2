@@ -1,8 +1,8 @@
 /* @flow */
 
-import { gql } from 'apollo-server-express';
+import { graphqls2s } from 'graphql-s2s';
 
-export default gql`
+export default graphqls2s.transpileSchema(`
   type Token {
     token: String!
     refresh_token: String!
@@ -35,6 +35,9 @@ export default gql`
     dislike: Int!
     reissue: Int!
   }
+  type UserWithReading inherits User {
+    reading: Int!
+  }
 
   input SignupInput {
     email: String
@@ -57,12 +60,14 @@ export default gql`
     me: User! @isAuth
     getUserByUsername(username: String!): User
     getUserActivity(username: String!): UserActivity
+    getUserReading(user_id: ID!, offset: Int = 0): [UserWithReading]! @checkAuth
+    getUserReaders(user_id: ID!, offset: Int = 0): [UserWithReading]! @checkAuth
   }
 
   extend type Mutation {
     signup(input: SignupInput!): User!
     signin(input: SigninInput!): Token!
     activate(input: ActivateInput!): Boolean!
-    requestActivation(email: String!) Boolean!
+    requestActivation(email: String!): Boolean!
   }
-`;
+`);

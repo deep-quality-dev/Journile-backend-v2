@@ -114,6 +114,7 @@ models.UserLogin.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.User.hasMany(models.Read, { as: 'reading', foreignKey: 'user_id' })
 models.User.hasMany(models.Read, { as: 'reader', foreignKey: 'reading_id' })
+models.User.hasMany(models.Read, { as: 'myRead', foreignKey: 'reading_id' })
 models.Read.belongsTo(models.User, { foreignKey: 'user_id' })
 
 models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
