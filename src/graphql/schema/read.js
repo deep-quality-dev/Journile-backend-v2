@@ -28,4 +28,8 @@ export default gql`
   extend type Query {
     getUserReads(user_id: ID!): [Read]!
   }
+
+  extend type Mutation {
+    readUser(user_id: ID!, read: Boolean): Boolean! @isAuth
+  }
 `;

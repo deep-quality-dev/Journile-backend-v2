@@ -27,7 +27,7 @@ const read = (sequelize: any, DataTypes: any) => {
     status: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: '0',
+      defaultValue: '1',
       validate: {
         isNumeric: true
       },
