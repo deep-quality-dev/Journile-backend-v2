@@ -24,7 +24,7 @@ export default graphqls2s.transpileSchema(`
 
   extend type Query {
     getChannels: [Channel]!
-    getHotChannels(count: Int): [Channel]!
+    getHotChannels(count: Int = 9): [Channel]!
     getChannel(id: ID!): Channel
     getChannelByUsername(username: String!): ChannelWithReading @checkAuth
   }

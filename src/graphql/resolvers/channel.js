@@ -26,7 +26,6 @@ export default {
     
     getHotChannels: async (parent: any, args: any, context: any, info: any) => {
       const { count } = args
-      const limit = count || 10;
 
       return await models.Channel.getHotChannels(limit);
     },
