@@ -27,6 +27,8 @@ export default gql`
 
   extend type Query {
     getUserReads(user_id: ID!): [Read]!
+    isReadingUser(user_id: ID!): Int! @isAuth
+    isReadingChannel(channel_id: ID!): Int! @isAuth
   }
 
   extend type Mutation {

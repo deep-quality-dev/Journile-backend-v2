@@ -11,6 +11,24 @@ export default {
 
       return await models.Read.getUserReads(user_id);
     },
+
+    isReadingUser: async (parent: any, args: any, context: any ) => {
+      const { user_id } = args
+      const { user } = context
+
+      const read = await models.Read.findOne({ where: { user_id: user.id, reading_id: user_id, type: 0 } });
+
+      return read? read.status: 0;
+    },
+
+    isReadingChannel: async (parent: any, args: any, context: any ) => {
+      const { channel_id } = args
+      const { user } = context
+
+      const read = await models.Read.findOne({ where: { user_id: user.id, reading_id: channel_id, type: 1 } });
+
+      return read? read.status: 0;
+    },
   },
 
   Mutation: {
