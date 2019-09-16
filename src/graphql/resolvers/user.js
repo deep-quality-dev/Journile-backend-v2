@@ -150,7 +150,7 @@ export default {
       }
 
       if (user) {
-        option.include.push({ model: models.Read, as: 'myRead', attributes: [], required: false, where: { user_id: user.id } });
+        option.include.push({ model: models.Read, as: 'myRead', attributes: [], required: false, where: { user_id: user.id, type: 0 } });
       }
 
       return await models.User.findAll(option);
@@ -202,7 +202,7 @@ export default {
       }
 
       if (user) {
-        option.include.push({ model: models.Read, as: 'myRead', attributes: [], where: { user_id: user.id } });
+        option.include.push({ model: models.Read, as: 'myRead', attributes: [], required: false, where: { user_id: user.id, type: 0 } });
       }
 
       return await models.User.findAll(option);

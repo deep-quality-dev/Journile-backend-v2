@@ -1,6 +1,6 @@
 {
   "apps" : [{
-    "name"      : "Journile",
+    "name"      : "Journile-BE",
     "script"    : "./build/index.js",
     "env": {
       "ENVIRONMENT": "production"

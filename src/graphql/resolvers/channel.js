@@ -1,6 +1,7 @@
 /* @flow */
 
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
+import Sequelize from 'sequelize';
 import { fieldsList } from 'graphql-fields-list';
 
 import models from '../../models';
@@ -35,6 +36,31 @@ export default {
       const option = getQueryOption(info)
 
       return await models.Channel.findByPk(id, { ...option });
+    },
+
+    getChannelByUsername: async (parent: any, params: any, context: any ) => {
+      const { username } = params
+      const { user } = context
+
+      const option = {
+        subQuery: false,
+        nest: true,
+        raw: true,
+        attributes: {
+          include: [
+            [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col('myRead.status')), 0): Sequelize.literal(0), 'reading' ],
+          ]
+        },
+        group: [ 'channel.id', 'country.id' ],
+        include: [{ model: models.Country, as: 'country' }],
+        where: { username },
+      }
+
+      if (user) {
+        option.include.push({ model: models.Read, as: 'myRead', attributes: [], required: false, where: { user_id: user.id, type: 1 } });
+      }
+
+      return await models.Channel.findOne(option);
     },
   },
 };
