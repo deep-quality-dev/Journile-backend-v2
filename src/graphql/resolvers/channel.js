@@ -27,7 +27,25 @@ export default {
     getHotChannels: async (parent: any, args: any, context: any, info: any) => {
       const { count } = args
 
-      return await models.Channel.getHotChannels(limit);
+      const option = {
+        subQuery: false,
+        nest: true,
+        raw: true,
+        attributes: {
+          include: [
+            [ Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col("reader.id"))), 'readers' ],
+          ]
+        },
+        include: [
+          { model: models.Country, as: 'country' },
+          { model: models.Read, as: 'reader', attributes: [], required: false, where: { type: 1, status: 1 } },
+        ],
+        group: [ 'channel.id', 'country.id' ],
+        limit: count,
+        order: [ [Sequelize.literal('readers'), 'DESC'], ],
+      }
+
+      return await models.Channel.findAll(option);
     },
 
     getChannel: async (parent: any, args: any, context: any, info: any) => {
