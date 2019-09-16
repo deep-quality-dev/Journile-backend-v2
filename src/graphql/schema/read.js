@@ -31,5 +31,6 @@ export default gql`
 
   extend type Mutation {
     readUser(user_id: ID!, reading: Int = 1): Boolean! @isAuth
+    readChannel(channel_id: ID!, reading: Int = 1): Boolean! @isAuth
   }
 `;

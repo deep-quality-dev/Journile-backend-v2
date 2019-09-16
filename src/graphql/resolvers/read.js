@@ -31,6 +31,21 @@ export default {
       await models.Read.upsert({user_id: user.id, reading_id: user_id, type: 0, status: reading}, { where: {user_id: user.id, reading_id: user_id, type: 0 } })
 
       return true;
+    },
+    
+    readChannel: async (parent: any, params: any, context: any) => {
+      let { channel_id, reading } = params
+      const { user } = context
+
+      const channel = await models.Channel.findByPk(channel_id, { where: { status: 0 } })
+
+      if (!channel) {
+        throw new UserInputError('Channel not exist.')
+      }
+
+      await models.Read.upsert({user_id: user.id, reading_id: channel_id, type: 1, status: reading}, { where: {user_id: user.id, reading_id: channel_id, type: 1 } })
+
+      return true;
     }
   }
 };
