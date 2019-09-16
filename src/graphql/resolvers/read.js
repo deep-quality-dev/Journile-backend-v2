@@ -11,6 +11,24 @@ export default {
 
       return await models.Read.getUserReads(user_id);
     },
+
+    isReadingUser: async (parent: any, args: any, context: any ) => {
+      const { user_id } = args
+      const { user } = context
+
+      const read = await models.Read.findOne({ where: { user_id: user.id, reading_id: user_id, type: 0 } });
+
+      return read? read.status: 0;
+    },
+
+    isReadingChannel: async (parent: any, args: any, context: any ) => {
+      const { channel_id } = args
+      const { user } = context
+
+      const read = await models.Read.findOne({ where: { user_id: user.id, reading_id: channel_id, type: 1 } });
+
+      return read? read.status: 0;
+    },
   },
 
   Mutation: {
@@ -29,6 +47,21 @@ export default {
       }
 
       await models.Read.upsert({user_id: user.id, reading_id: user_id, type: 0, status: reading}, { where: {user_id: user.id, reading_id: user_id, type: 0 } })
+
+      return true;
+    },
+    
+    readChannel: async (parent: any, params: any, context: any) => {
+      let { channel_id, reading } = params
+      const { user } = context
+
+      const channel = await models.Channel.findByPk(channel_id, { where: { status: 0 } })
+
+      if (!channel) {
+        throw new UserInputError('Channel not exist.')
+      }
+
+      await models.Read.upsert({user_id: user.id, reading_id: channel_id, type: 1, status: reading}, { where: {user_id: user.id, reading_id: channel_id, type: 1 } })
 
       return true;
     }

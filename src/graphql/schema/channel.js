@@ -1,8 +1,8 @@
 /* @flow */
 
-import { gql } from 'apollo-server-express';
+import { graphqls2s } from 'graphql-s2s';
 
-export default gql`
+export default graphqls2s.transpileSchema(`
   type Channel {
     id: ID!
     name: String!
@@ -15,13 +15,17 @@ export default gql`
     type: Int
     description: String
     status: Int! @isAuth
-    create_date: Date! @isAuth
+    create_date: Date!
     update_date: Date! @isAuth
+  }
+  type ChannelWithReading inherits Channel {
+    reading: Int!
   }
 
   extend type Query {
     getChannels: [Channel]!
-    getHotChannels(count: Int): [Channel]!
+    getHotChannels(count: Int = 9): [Channel]!
     getChannel(id: ID!): Channel
+    getChannelByUsername(username: String!): ChannelWithReading @checkAuth
   }
-`;
+`);

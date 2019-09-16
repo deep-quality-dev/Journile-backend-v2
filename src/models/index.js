@@ -117,6 +117,10 @@ models.User.hasMany(models.Read, { as: 'reader', foreignKey: 'reading_id' })
 models.User.hasMany(models.Read, { as: 'myRead', foreignKey: 'reading_id' })
 models.Read.belongsTo(models.User, { foreignKey: 'user_id' })
 
+models.Channel.hasMany(models.Read, { as: 'reader', foreignKey: 'reading_id' })
+models.Channel.hasMany(models.Read, { as: 'myRead', foreignKey: 'reading_id' })
+models.Read.belongsTo(models.Channel, { foreignKey: 'reading_id' })
+
 models.User.hasOne(models.UserSetting, { foreignKey: 'user_id' })
 models.UserSetting.belongsTo(models.User, { foreignKey: 'user_id' })
 

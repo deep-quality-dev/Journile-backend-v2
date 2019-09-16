@@ -62,6 +62,7 @@ export default gql`
     getPosts(date: Date, isLater: Boolean): [Post!]! @checkAuth
     getHotTopics(count: Int): [Post!]!
     getUserPosts(user_id: ID!, date: Date, isLater: Boolean): [Post!]! @checkAuth
+    getChannelPosts(channel_id: ID!, date: Date, isLater: Boolean): [Post!]! @checkAuth
   }
 
   extend type Mutation {
