@@ -142,6 +142,21 @@ export default {
 
       return await models.Post.findAll({ ...option });
     },
+    
+    getChannelPosts: async (parent: any, params: any, context: any, info: any) => {
+      const { channel_id, date, isLater } = params
+      const { user } = context
+      let option = getQueryOption(info, user)
+
+      let where: any = { channel_id };
+      
+      if (date) {
+        where["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
+      }
+      option.where = where;
+
+      return await models.Post.findAll({ ...option });
+    },
   },
 
   Mutation: {
