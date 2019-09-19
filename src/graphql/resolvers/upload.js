@@ -3,16 +3,19 @@
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
 
 import models from '../../models';
+import uploader from '../../middleware/uploader';
 import logger from '../../middleware/logger';
 
 export default {
   Mutation: {
     upload: async (parent: any, args: any, context: any, info: any) => {
       const { file } = args
-      const { stream, filename, mimetype, encoding } = await file;
-      logger.info('file', file)
+      const { createReadStream, filename, mimetype, encoding } = await file;
+      const stream = createReadStream()
 
-      return { filename, mimetype, encoding };
+      const url = await uploader.uploadFileFromStream(stream, filename, mimetype);
+
+      return { url, filename, mimetype, encoding };
     },
   },
 };
