@@ -18,7 +18,8 @@ const PostType = {
   Video: 1,
   Photo: 2,
   Location: 3,
-  MultiMedia: 4,
+  Poll: 4,
+  Link: 5,
 };
 
 const GammaTagLimitLength = 20;
@@ -79,7 +80,7 @@ function languageFinder(description: string) {
   }
 }
 
-function filterGammatags(gammatags: string[]) {
+function filterGammatags(gammatags: Array<string>) {
   gammatags = gammatags || []
   for (var i=0; i<gammatags.length; i++) {
     var tag = gammatags[i];
@@ -92,6 +93,19 @@ function filterGammatags(gammatags: string[]) {
   });
 
   return gammatags.slice(0, GammaTagLimitCount);
+}
+
+async function rateGammatags(gammatags: Array<string>) {
+  for (let i=0; i<gammatags.length; i++) {
+    await models.Gammatag.findOne({ where: { name: gammatags[i] } })
+      .then(obj => {
+        if(obj) { 
+          return obj.update({ rate: Sequelize.literal('rate + 1') });
+        } else {
+          return models.Gammatag.create({ name: gammatags[i], rate: 1 });
+        }
+      });
+  }
 }
 
 export default {
@@ -256,7 +270,7 @@ export default {
 
         logger.info('--------------------------------------------------------');
         let cover_image_url = null
-        if (type != PostType.Photo && cover_image) {
+        if (type != PostType.Photo && type != PostType.MultiMedia && cover_image) {
           cover_image_url = await fileUploader.uploadImageFromUrl(cover_image);
         }
 
@@ -283,10 +297,10 @@ export default {
         }
         // await savePolls(data, client, postId);
 
-        // await gammatagClient.rateGammatags(data.gamma_tags, client);
-
         await transaction.commit();
         logger.info('--------------------------------------------------------');
+
+        await rateGammatags(gamma_tags);
         
         return post_id;
       } catch (err) {
