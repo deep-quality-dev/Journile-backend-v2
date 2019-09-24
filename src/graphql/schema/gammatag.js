@@ -18,4 +18,8 @@ export default gql`
     getGammatagByName(name: String!): Gammatag
     searchGammatag(name: String!, count: Int = 5): [Gammatag]!
   }
+
+  extend type Mutation {
+    addGammatag(name: String!): Boolean
+  }
 `;

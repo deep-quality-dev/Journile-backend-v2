@@ -30,4 +30,31 @@ export default {
       return await models.Gammatag.findAll({ where: { name: { [Op.like]: `%${name}%` } },  order: [['rate', 'DESC']], limit: count });
     },
   },
+
+  Mutation: {
+    addGammatag: async (parent: any, params: any) => {
+      let { name } = params
+
+      if (!name) {
+        throw new UserInputError('Invalid tag name.')
+      }
+
+      const duplication = await models.Gammatag.findOne({ where: { name } });
+
+      if (duplication) {
+        throw new UserInputError('Duplicated');
+      }
+
+      try {
+        const gammatag = await models.Gammatag.create({
+          name,
+          rate: 0,
+        })
+
+        return true;
+      } catch (err) {
+        throw err;
+      }
+    },
+  }
 };
