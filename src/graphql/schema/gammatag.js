@@ -13,8 +13,9 @@ export default gql`
   }
 
   extend type Query {
-    getTrendingGammatags(count: Int): [Gammatag]!
+    getTrendingGammatags(count: Int = 10): [Gammatag]!
     getGammatag(id: ID!): Gammatag
     getGammatagByName(name: String!): Gammatag
+    searchGammatag(name: String!, count: Int = 5): [Gammatag]!
   }
 `;
