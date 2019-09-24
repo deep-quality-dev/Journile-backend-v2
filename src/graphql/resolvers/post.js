@@ -22,8 +22,8 @@ const PostType = {
   Link: 5,
 };
 
-const GammaTagLimitLength = 20;
-const GammaTagLimitCount = 5;
+const GammatagLimitLength = 20;
+const GammatagLimitCount = 5;
 const SpiderMaxContinuousLimit = 500;
 
 function getQueryOption(info: any, user: any) {
@@ -89,10 +89,10 @@ function filterGammatags(gammatags: Array<string>) {
   }
   
   gammatags = gammatags.filter(function(item, pos, self) {
-    return item.length < GammaTagLimitLength && self.indexOf(item) == pos;
+    return item.length < GammatagLimitLength && self.indexOf(item) == pos;
   });
 
-  return gammatags.slice(0, GammaTagLimitCount);
+  return gammatags.slice(0, GammatagLimitCount);
 }
 
 async function rateGammatags(gammatags: Array<string>) {
@@ -183,7 +183,7 @@ export default {
           original_url,
           original_post_date,
           category_id,
-          gamma_tags,
+          gammatags,
           images,
           videos,
           reissued_id,
@@ -195,18 +195,17 @@ export default {
         title: Joi.string().min(3).max(256),
         cover_image: Joi.string().uri(),
         original_url: Joi.string().uri(),
-        gamma_tags: Joi.array().items(Joi.string()).required(),
+        gammatags: Joi.array().items(Joi.string()).required(),
         images: Joi.array().items(Joi.string().uri()),
         videos: Joi.array().items(Joi.string().uri()),
       });
 
       try {
-        Joi.assert({ title, cover_image, original_url, gamma_tags, images, videos }, schema);
+        Joi.assert({ title, cover_image, original_url, gammatags, images, videos }, schema);
       } catch (err) { throw new UserInputError(err.details[0].message) }
 
       try {
         const duplication = await models.Post.findAll({ where: { title: { [Op.like]: `%${title}%` }, original_url: { [Op.like]: `%${original_url}%` } } });
-        logger.info('duplication', duplication)
 
         if (duplication.length > 0) {
           throw new UserInputError('Duplicated post');
@@ -233,7 +232,7 @@ export default {
           original_url,
           original_post_date,
           category_id,
-          gamma_tags,
+          gammatags,
           images,
           videos,
         }
@@ -243,26 +242,26 @@ export default {
         title: Joi.string().min(3).max(256),
         cover_image: Joi.string().uri(),
         original_url: Joi.string().uri(),
-        gamma_tags: Joi.array().items(Joi.string()).required(),
+        gammatags: Joi.array().items(Joi.string()).required(),
         images: Joi.array().items(Joi.string().uri()),
         videos: Joi.array().items(Joi.string().uri()),
       });
 
       try {
-        Joi.assert({ title, cover_image, original_url, gamma_tags, images, videos }, schema);
+        Joi.assert({ title, cover_image, original_url, gammatags, images, videos }, schema);
       } catch (err) { throw new UserInputError(err.details[0].message) }
 
       let language, transaction;
       try {
-        // const duplication = await models.Post.findAll({ where: { title: { [Op.like]: `%${title}%` }, original_url: { [Op.like]: `%${original_url}%` } } });
+        const duplication = await models.Post.findAll({ where: { title: { [Op.like]: `%${title}%` }, original_url: { [Op.like]: `%${original_url}%` } } });
 
-        // if (duplication.length > 0) {
-        //   throw new UserInputError('Duplicated post');
-        // }
+        if (duplication.length > 0) {
+          throw new UserInputError('Duplicated post');
+        }
 
         language = languageFinder(description);
-        gamma_tags = [scraper.username].concat(gamma_tags);
-        gamma_tags = filterGammatags(gamma_tags);
+        gammatags = [scraper.username].concat(gammatags);
+        gammatags = filterGammatags(gammatags);
       } catch (err) { throw err }
 
       try {
@@ -270,7 +269,7 @@ export default {
 
         logger.info('--------------------------------------------------------');
         let cover_image_url = null
-        if (type != PostType.Photo && type != PostType.MultiMedia && cover_image) {
+        if (type != PostType.Photo && cover_image) {
           cover_image_url = await fileUploader.uploadImageFromUrl(cover_image);
         }
 
@@ -283,7 +282,7 @@ export default {
           original_post_date,
           category_id,
           channel_id: scraper.channel_id,
-          gamma_tags: gamma_tags.join(','),
+          gammatags: gammatags.join(','),
           language,
         }, { transaction })
         const post_id = result.id
@@ -300,7 +299,7 @@ export default {
         await transaction.commit();
         logger.info('--------------------------------------------------------');
 
-        await rateGammatags(gamma_tags);
+        await rateGammatags(gammatags);
         
         return post_id;
       } catch (err) {

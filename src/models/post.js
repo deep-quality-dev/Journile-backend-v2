@@ -78,7 +78,7 @@ const post = (sequelize: any, DataTypes: any) => {
     author_id: {
       type: DataTypes.INTEGER,
     },
-    gamma_tags: {
+    gammatags: {
       type: DataTypes.STRING,
     },
     reissued_id: {

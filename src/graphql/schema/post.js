@@ -30,7 +30,7 @@ export default gql`
     channel: Channel
     author: User
     media: PostMediaDetail!
-    gamma_tags: String
+    gammatags: String
     reissued_id: ID
     language: String!
     rate: PostRateDetail!
@@ -51,7 +51,7 @@ export default gql`
     original_url: String
     original_post_date: Date!
     category_id: ID!
-    gamma_tags: [String!]!
+    gammatags: [String!]!
     images: [String!]
     videos: [String!]
     reissued_id: ID
