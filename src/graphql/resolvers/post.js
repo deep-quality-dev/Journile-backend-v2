@@ -191,6 +191,11 @@ export default {
         }
       } = params;
 
+      const { user } = context
+      if (!user) {
+        throw new UserInputError('Unauthorized user');
+      }
+
       const schema = Joi.object().keys({
         title: Joi.string().min(3).max(256),
         cover_image: Joi.string().uri(),
@@ -205,17 +210,55 @@ export default {
       } catch (err) { throw new UserInputError(err.details[0].message) }
 
       try {
-        const duplication = await models.Post.findAll({ where: { title: { [Op.like]: `%${title}%` }, original_url: { [Op.like]: `%${original_url}%` } } });
-
-        if (duplication.length > 0) {
-          throw new UserInputError('Duplicated post');
-        }
-
         if (!language) {
           language = languageFinder(description);
         }
+        gammatags = filterGammatags(gammatags);
 
       } catch (err) { throw err }
+
+      let transaction;
+      try {
+        transaction = await models.transaction();
+
+        logger.info('--------------------------------------------------------');
+        let cover_image_url = null
+        if (type != PostType.Photo && cover_image) {
+          cover_image_url = await fileUploader.uploadImageFromUrl(cover_image);
+        }
+
+        const result = await models.Post.create({
+          title,
+          description,
+          cover_image: cover_image_url,
+          type,
+          original_url,
+          original_post_date,
+          category_id,
+          author_id: user.id,
+          gammatags: gammatags.join(','),
+          language,
+        }, { transaction })
+        const post_id = result.id
+
+        if (type === PostType.Video && videos && videos.length > 0) {
+          await models.PostMedia.uploadMedia(post_id, 1, videos, transaction);
+        }
+        if (type === PostType.Photo && images && images.length > 0) {
+          await models.PostMedia.uploadMedia(post_id, 0, images, transaction);
+        }
+        // await savePolls(data, client, postId);
+
+        await transaction.commit();
+        logger.info('--------------------------------------------------------');
+
+        await rateGammatags(gammatags);
+        
+        return post_id;
+      } catch (err) {
+        if (transaction) await transaction.rollback();
+        throw err;
+      }
     },
     
     scraperPost: async (parent: any, params: any, context: any) => {
@@ -288,10 +331,10 @@ export default {
         const post_id = result.id
 
         logger.info('videos', videos);
-        if (videos && videos.length > 0) {
+        if (type === PostType.Video && videos && videos.length > 0) {
           await models.PostMedia.uploadMedia(post_id, 1, videos, transaction);
         }
-        if (images && images.length > 0) {
+        if (type === PostType.Photo && images && images.length > 0) {
           await models.PostMedia.uploadMedia(post_id, 0, images, transaction);
         }
         // await savePolls(data, client, postId);
