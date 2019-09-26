@@ -21,6 +21,11 @@ class S3FileUploader {
     try
     {
       if(!url || typeof url != 'string') throw new Error('Missing parameter \'url\'.');
+
+      if (url.match(/\/public\/media\?name=[\w-\.]+&sk=[\w-\.]+&da=\d+/)) {
+        // already uploaded
+        return url;
+      }
       
       const parsed = new Url(url);
       let extension = 'png';

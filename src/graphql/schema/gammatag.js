@@ -20,6 +20,6 @@ export default gql`
   }
 
   extend type Mutation {
-    addGammatag(name: String!): Boolean
+    addGammatag(name: String!): Boolean @isAuth
   }
 `;
