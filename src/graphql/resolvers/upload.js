@@ -1,18 +1,67 @@
 /* @flow */
 
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
+import path from 'path';
+import fs from 'fs';
+import ffmpeg from 'fluent-ffmpeg';
+import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 
 import models from '../../models';
+import uploader from '../../middleware/uploader';
 import logger from '../../middleware/logger';
+import config from '../../config';
+
+const uploadPath = path.join(__dirname, config.env_mode === 'production'? '../public/upload/': '../../../public/upload/');
+
+ffmpeg.setFfmpegPath(ffmpegPath);
+
+function asyncFFMpeg(ff: any) {
+  return new Promise(function (resolve, reject) {
+    ff.on('error', (err) => reject(err))
+    .on('end', () => {
+      resolve();
+    });
+  });
+}
 
 export default {
   Mutation: {
     upload: async (parent: any, args: any, context: any, info: any) => {
       const { file } = args
-      const { stream, filename, mimetype, encoding } = await file;
-      logger.info('file', file)
+      const { createReadStream, filename, mimetype, encoding } = await file;
+      const stream = createReadStream()
 
-      return { filename, mimetype, encoding };
+      if (mimetype.toLowerCase().startsWith('image')) {
+        const url = await uploader.uploadFileFromStream(stream, filename, mimetype);
+
+        return { url, filename, mimetype, encoding };
+      } else if (mimetype.toLowerCase().startsWith('video')) {
+        const thumbDir = uploadPath + 'thumbnail/';
+        if (!fs.existsSync(thumbDir)){
+            fs.mkdirSync(thumbDir);
+        }
+        const thumbFileName = 'thumbnail_'+Date.now()+'.jpeg';
+        await asyncFFMpeg(ffmpeg(stream)
+          .takeScreenshots({
+            count: 1,
+            filename: thumbFileName,
+            timemarks: [ 5 ], // number of seconds
+            }, thumbDir, function(err) {
+          })
+        );
+        const url = await uploader.uploadFileFromStream(stream, filename, mimetype);
+
+        const thumbUrl = await uploader.uploadFileFromStream(fs.createReadStream(thumbDir + thumbFileName), thumbFileName, 'image/jpeg');
+        try {
+          fs.unlinkSync(thumbDir + thumbFileName);
+        } catch (err) {
+          logger.error('Error on removing file:' + err);
+        }
+
+        return { url, thumbUrl, filename, mimetype, encoding };
+      }
+
+      throw new UserInputError('Unkown media type');
     },
   },
 };

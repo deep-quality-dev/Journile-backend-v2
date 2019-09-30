@@ -30,7 +30,7 @@ export default gql`
     channel: Channel
     author: User
     media: PostMediaDetail!
-    gamma_tags: String
+    gammatags: String
     reissued_id: ID
     language: String!
     rate: PostRateDetail!
@@ -43,6 +43,11 @@ export default gql`
     update_date: Date! @isAuth
   }
 
+  input VideoInput {
+    url: String!
+    thumb_url: String
+  }
+
   input PostInput {
     title: String!
     description: String
@@ -51,9 +56,9 @@ export default gql`
     original_url: String
     original_post_date: Date!
     category_id: ID!
-    gamma_tags: [String!]!
+    gammatags: [String!]!
     images: [String!]
-    videos: [String!]
+    videos: [VideoInput!]
     reissued_id: ID
     language: String
   }

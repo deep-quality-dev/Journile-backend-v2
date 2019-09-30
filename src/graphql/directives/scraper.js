@@ -21,43 +21,43 @@ const verifyPromise = (token: string) => new Promise((resolve, reject) => {
 });
 
 function checkAuth(authorization: string) {
-	let token: ?string = null;
+  let token: ?string = null;
 
-	var parts = authorization.split(' ');
-	if (parts.length == 1) {
-		token = authorization;
-	} else if (parts.length == 2) {
-		var scheme = parts[0];
-		var credentials = parts[1];
+  var parts = authorization.split(' ');
+  if (parts.length == 1) {
+    token = authorization;
+  } else if (parts.length == 2) {
+    var scheme = parts[0];
+    var credentials = parts[1];
 
-		if (/^Bearer$/i.test(scheme)) {
-			token = credentials;
-		}
-	}
+    if (/^Bearer$/i.test(scheme)) {
+      token = credentials;
+    }
+  }
 
-	if (token) {
-		return verifyPromise(token)
-	} else {
-		return new Promise((resolve, rejects) => {
-			rejects(new UserInputError('Format is Authorization: Bearer [token]'));
-		})
-	}
+  if (token) {
+    return verifyPromise(token)
+  } else {
+    return new Promise((resolve, rejects) => {
+      rejects(new UserInputError('Format is Authorization: Bearer [token]'));
+    })
+  }
 }
 
 export class IsScraperAuthDirective extends SchemaDirectiveVisitor {
-	visitFieldDefinition(field: any) {
-		const { resolve = defaultFieldResolver } = field;
-		field.resolve = async function (...args) {
-			const [ , params, context ] = args;
-			const { authorization } = context;
-			if (authorization) {
-				const decoded = await checkAuth(authorization);
-				context.scraper = decoded;
-				const result = await resolve.apply(this, args);
-				return result;
-			} else {
-				throw new AuthenticationError('You must be the authenticated user to get this information');
-			}
-		};
-	}
+  visitFieldDefinition(field: any) {
+    const { resolve = defaultFieldResolver } = field;
+    field.resolve = async function (...args) {
+      const [ , params, context ] = args;
+      const { authorization } = context;
+      if (authorization) {
+        const decoded = await checkAuth(authorization);
+        context.scraper = decoded;
+        const result = await resolve.apply(this, args);
+        return result;
+      } else {
+        throw new AuthenticationError('You must be the authenticated user to get this information');
+      }
+    };
+  }
 }

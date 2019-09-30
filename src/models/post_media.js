@@ -21,6 +21,13 @@ const postMedia = (sequelize: any, DataTypes: any) => {
     },
     url: {
       type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isUrl: true,
+      },
+    },
+    thumb: {
+      type: DataTypes.STRING,
       validate: {
         isUrl: true,
       },
@@ -39,21 +46,22 @@ const postMedia = (sequelize: any, DataTypes: any) => {
     timestamps: false,
   });
 
-  PostMedia.uploadMedia = async function (post_id: number, type: number, urls: string[], transaction: any) {
-    if(!urls || urls.length < 1) throw new Error ("Parameter 'urls' is missed")
+  PostMedia.uploadMedia = async function (post_id: number, type: number, urls: Array<any>, transaction: any) {
+    if(!urls || urls.length < 1) throw new Error ('Parameter \'urls\' is missed')
     
-    let fileUrls = [], insertData = [], filePath:string = "";
+    let insertData = [], filePath: string = '', thumbUrl: ?string = null;
 
     try {
       for(let i = 0; i < urls.length; i++) {
-        filePath ='';
+        filePath = '';
+        thumbUrl = null;
         if (type == 0) {
           filePath = await fileUploader.uploadImageFromUrl(urls[i]);
         } else {
-          filePath = urls[i]; //await fileUploader.uploadVideoFromUrl(urls[i]);
+          filePath = urls[i].url;
+          thumbUrl = await fileUploader.uploadImageFromUrl(urls[i].thumb_url);
         }
-        fileUrls.push(filePath);
-        insertData.push ({ post_id, type, url: filePath });
+        insertData.push ({ post_id, type, url: filePath, thumb: thumbUrl });
       }
       const option = transaction? { transaction } : {}
       await PostMedia.bulkCreate(insertData, option)
