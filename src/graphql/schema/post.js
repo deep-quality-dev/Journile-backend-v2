@@ -43,6 +43,11 @@ export default gql`
     update_date: Date! @isAuth
   }
 
+  input VideoInput {
+    url: String!
+    thumb_url: String
+  }
+
   input PostInput {
     title: String!
     description: String
@@ -53,7 +58,7 @@ export default gql`
     category_id: ID!
     gammatags: [String!]!
     images: [String!]
-    videos: [String!]
+    videos: [VideoInput!]
     reissued_id: ID
     language: String
   }

@@ -1,49 +1,55 @@
-import { Router, Request, Response, NextFunction } from "express";
+/* @flow */
+
+import { Router, Request, Response, NextFunction } from 'express';
 import axios from 'axios';
-import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 import config from '../config';
 import logger from '../middleware/logger';
 
 const router = Router();
 
-router.route("/")
-	.get(function(req: Request, res: Response, next: NextFunction) {
-		try {
-			const url = `https://s3.amazonaws.com/${config.aws_s3_bucket}/${req.query.name}`;
-			if(!req.query.sk || req.query.sk == '') { 
-				res.status(500).json({
-					messages: [ "Internal Server Error", "Missing parameter \'sk\'." ]
-				});				
-				return;
-			}
-			if(!req.query.da || req.query.da =='') { 
-				res.status(500).json({
-					messages: [ "Internal Server Error", "Missing parameter \'da\'." ]
-				});
-				return;
-			}
-			let decoded = jwt.verify(req.query.sk, config.secret_key, {ignoreExpiration: true});
-			let arrName = req.query.name.split(".");
-			arrName.pop();
-			if(arrName[0] != decoded){
-				res.status(500).json({
-					messages: [ "Internal Server Error", "Missing parameter \'sk\'." ]
-				});
-				return;
-			}
-			let reqData = new Date(Number(req.query.da));
-			if(isNaN(reqData.getDate())) {
-				res.status(500).json({
-					messages: ["Internal Server Error", "Missing parameter \'da\' in body."]
-				});
-				return;
-			}
-			axios({ method: 'get', url, responseType: 'stream' }).then(result => result.data.pipe(res));
-		} catch (err) {
-			logger.error("Error on router.public.media.get" + err);
-			res.status(500).send("Error getting media.");
-		}
-	});
+function validate(req: Request, res: Response): boolean {
+  const decipher = crypto.createDecipher('aes256', config.secret_key);
+  const decrypted = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
+  if(!req.params.filename || req.params.filename !== decrypted){
+    res.status(404).json({
+      messages: ['Not found']
+    });
+    return false;
+  }
+
+  return true;
+}
+
+router.route('/image/:hash/:filename')
+  .get(function(req: Request, res: Response, next: NextFunction) {
+    try {
+      if(!validate(req, res)) {
+        return;
+      }
+      
+      const url = `https://s3.amazonaws.com/${config.aws_s3_bucket}/${req.params.filename}`;
+      axios({ method: 'get', url, responseType: 'stream' }).then(result => result.data.pipe(res));
+    } catch (err) {
+      logger.error('Error on router.public.media.get' + err);
+      res.status(500).send('Error getting media.');
+    }
+  });
+
+router.route('/video/:hash/:filename/:key')
+  .get(function(req: Request, res: Response, next: NextFunction) {
+    try {
+      if(!validate(req, res)) {
+        return;
+      }
+      
+      const url = `${config.wowza_server_root_url}video/_definst_/mp4:stream/${req.params.filename}/${req.params.key}`;
+      axios({ method: 'get', url, responseType: 'stream' }).then(result => result.data.pipe(res));
+    } catch (err) {
+      logger.error('Error on router.public.media.get' + err);
+      res.status(500).send('Error getting media.');
+    }
+  });
 
 export default router;

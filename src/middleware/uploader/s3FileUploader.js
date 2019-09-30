@@ -1,7 +1,9 @@
+/* @flow */
+
 import AWS from 'aws-sdk';
 import axios from 'axios';
 import Url from 'url-parse';
-import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import uuid from 'uuid/v4';
 import S3Stream from 's3-upload-stream';
 
@@ -22,7 +24,7 @@ class S3FileUploader {
     {
       if(!url || typeof url != 'string') throw new Error('Missing parameter \'url\'.');
 
-      if (url.match(/\/public\/media\?name=[\w-\.]+&sk=[\w-\.]+&da=\d+/)) {
+      if (url.startsWith(`${config.server_root_url}public/media/`)) {
         // already uploaded
         return url;
       }
@@ -36,9 +38,7 @@ class S3FileUploader {
       }
 
       const rand = uuid();
-      const token = jwt.sign(rand, config.secret_key);
       const fileKey = `${rand}.${extension}`;
-      const fileUrl = `${config.server_root_url}public/media?name=${fileKey}&sk=${token}&da=${new Date().getTime()}`;
 
       let response = await axios({ method: 'get', url, responseType: 'arraybuffer' }).then( async result => {
         return await s3.putObject({
@@ -53,6 +53,10 @@ class S3FileUploader {
         throw err;
       });
       
+      const cipher = crypto.createCipher('aes256', config.secret_key);
+      const hash = cipher.update(fileKey, 'utf8', 'hex') + cipher.final('hex');
+      const fileUrl = `${config.server_root_url}public/media/image/${hash}/${fileKey}`;
+
       return fileUrl;
     } catch(ex){
       logger.error('Error on utility.S3FileUpload.uploadImageFromUrl: ' + ex);
@@ -61,7 +65,7 @@ class S3FileUploader {
   };
 
   
-  async uploadFileFromStream(inputStream: fs.ReadStream, fileName: string, mimetype: string) {
+  async uploadFileFromStream(inputStream: any, fileName: string, mimetype: string) {
     try
     {
       if(!inputStream) throw new Error('Missing parameter \'inputStream\'.');
@@ -72,9 +76,7 @@ class S3FileUploader {
       }
 
       const rand = uuid();
-      const token = jwt.sign(rand, config.secret_key);
       const fileKey = `${rand}.${extension}`;
-      const fileUrl = `${config.server_root_url}public/media?name=${fileKey}&sk=${token}&da=${new Date().getTime()}`;
 
       let upload = s3Stream.upload({
         ACL: 'public-read',
@@ -89,6 +91,11 @@ class S3FileUploader {
         upload.on('error', reject);
         upload.on('uploaded', (details) => resolve(details))
       })
+      
+      const cipher = crypto.createCipher('aes256', config.secret_key);
+      const hash = cipher.update(fileKey, 'utf8', 'hex') + cipher.final('hex');
+      const mediaType = mimetype.split('/')[0];
+      const fileUrl = `${config.server_root_url}public/media/${mediaType}/${hash}/${fileKey}`;
       
       return fileUrl;
     } catch(ex){

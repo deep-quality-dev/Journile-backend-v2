@@ -196,13 +196,21 @@ export default {
         throw new UserInputError('Unauthorized user');
       }
 
+      if (!cover_image) cover_image = null;
+      if (!original_url) original_url = null;
+
+      const videoSchema = Joi.object().keys({
+        url: Joi.string().uri().required(),
+        thumb_url: Joi.string().uri(),
+      }).required();
+
       const schema = Joi.object().keys({
         title: Joi.string().min(3).max(256),
-        cover_image: Joi.string().uri(),
-        original_url: Joi.string().uri(),
+        cover_image: Joi.string().uri().allow(null),
+        original_url: Joi.string().uri().allow(null),
         gammatags: Joi.array().items(Joi.string()).required(),
         images: Joi.array().items(Joi.string().uri()),
-        videos: Joi.array().items(Joi.string().uri()),
+        videos: Joi.array().items(videoSchema),
       });
 
       try {
@@ -281,13 +289,18 @@ export default {
         }
       } = params;
 
+      const videoSchema = Joi.object().keys({
+        url: Joi.string().uri().required(),
+        thumb_url: Joi.string().uri(),
+      }).required();
+
       const schema = Joi.object().keys({
         title: Joi.string().min(3).max(256),
         cover_image: Joi.string().uri(),
         original_url: Joi.string().uri(),
         gammatags: Joi.array().items(Joi.string()).required(),
         images: Joi.array().items(Joi.string().uri()),
-        videos: Joi.array().items(Joi.string().uri()),
+        videos: Joi.array().items(videoSchema),
       });
 
       try {

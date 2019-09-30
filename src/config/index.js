@@ -27,6 +27,7 @@ export default {
   aws_smtp_region: process.env.AWS_SMTP_REGION || '',
 
   server_root_url: process.env.SERVER_ROOT_URL || '',
+  wowza_server_root_url: process.env.WOWZA_SERVER_ROOT_URL || '',
   web_root_url: process.env.WEB_ROOT_URL || '',
 
   ssl: process.env.ENVIRONMENT == 'production'? process.env.SSL : false,
@@ -35,7 +36,7 @@ export default {
   activation_code_expiresin: parseInt(process.env.ACTIVATION_CODE_EXPIRESIN) || 86400,
   activation_link_url: process.env.ACTIVATION_LINK_URL || 'activate',
 
-  secret_key: process.env.SECRET_KEY,
+  secret_key: process.env.SECRET_KEY || '',
   token_expiresin: process.env.TOKEN_EXPIRESIN || '30m',
   refresh_token_expiresin: process.env.REFRESH_TOKEN_EXPIRESIN || '12h',
 

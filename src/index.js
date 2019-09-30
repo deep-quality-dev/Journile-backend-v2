@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from "path";
 import https from 'https';
 import http from 'http';
+import cors from 'cors';
 import helmet from 'helmet';
 import passport from 'passport';
 
@@ -32,8 +33,9 @@ const apollo = new ApolloServer({
 
 const app = express()
 app.use(passport.initialize())
-app.use('/public', express.static(path.join(__dirname, '../public')));
-app.use('/public/media', mediaRouter);
+app.use(cors())
+app.use('/public', express.static(path.join(__dirname, '../public')))
+app.use('/public/media', mediaRouter)
 app.use(helmet())
 
 apollo.applyMiddleware({ app })
