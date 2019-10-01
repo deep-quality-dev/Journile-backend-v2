@@ -202,7 +202,7 @@ export default {
       const videoSchema = Joi.object().keys({
         url: Joi.string().uri().required(),
         thumb_url: Joi.string().uri().allow(null),
-      }).required();
+      });
 
       const schema = Joi.object().keys({
         title: Joi.string().min(3).max(256),
@@ -229,7 +229,7 @@ export default {
       try {
         transaction = await models.transaction();
 
-        logger.info('--------------------------------------------------------');
+        logger.info('------------------- start user post --------------------');
         let cover_image_url = null
         if (type != PostType.Photo && cover_image) {
           cover_image_url = await fileUploader.uploadImageFromUrl(cover_image);
@@ -264,6 +264,7 @@ export default {
         
         return post_id;
       } catch (err) {
+      console.log('user post error', err);
         if (transaction) await transaction.rollback();
         throw err;
       }
@@ -292,7 +293,7 @@ export default {
       const videoSchema = Joi.object().keys({
         url: Joi.string().uri().required(),
         thumb_url: Joi.string().uri().allow(null),
-      }).required();
+      });
 
       const schema = Joi.object().keys({
         title: Joi.string().min(3).max(256),
@@ -323,7 +324,7 @@ export default {
       try {
         transaction = await models.transaction();
 
-        logger.info('--------------------------------------------------------');
+        logger.info('----------------- start scrapper post ------------------');
         let cover_image_url = null
         if (type != PostType.Photo && cover_image) {
           cover_image_url = await fileUploader.uploadImageFromUrl(cover_image);
