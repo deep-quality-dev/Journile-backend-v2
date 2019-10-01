@@ -9,9 +9,14 @@ export default gql`
     status: Int!
   }
 
+  type VideoData {
+    url: String!
+    thumb_url: String
+  }
+
   type PostMediaDetail {
     images: [String!]
-    videos: [String!]
+    videos: [VideoData!]
   }
 
   type ReplyDetail {

@@ -44,7 +44,7 @@ function getQueryOption(info: any, user: any) {
       { model: models.User, as: 'author' },
       { model: models.PostMedia, as: 'media', attributes: [
         [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.col("media.url")), { "$media.type$": 0 }, models.PostMedia), "images" ],
-        [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.col("media.url")), { "$media.type$": 1 }, models.PostMedia), "videos" ],
+        [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.fn('JSON_BUILD_OBJECT', 'url', Sequelize.col("media.url"), 'thumb_url', Sequelize.col("media.thumb"))), { "$media.type$": 1 }, models.PostMedia), "videos" ],
       ], noPrimaryKey: true },
       { model: models.PostRate, as: 'rate', attributes: [
         [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 1 }, models.PostRate), "like" ],
@@ -201,7 +201,7 @@ export default {
 
       const videoSchema = Joi.object().keys({
         url: Joi.string().uri().required(),
-        thumb_url: Joi.string().uri(),
+        thumb_url: Joi.string().uri().allow(null),
       }).required();
 
       const schema = Joi.object().keys({
@@ -291,12 +291,12 @@ export default {
 
       const videoSchema = Joi.object().keys({
         url: Joi.string().uri().required(),
-        thumb_url: Joi.string().uri(),
+        thumb_url: Joi.string().uri().allow(null),
       }).required();
 
       const schema = Joi.object().keys({
         title: Joi.string().min(3).max(256),
-        cover_image: Joi.string().uri(),
+        cover_image: Joi.string().uri().allow(null),
         original_url: Joi.string().uri(),
         gammatags: Joi.array().items(Joi.string()).required(),
         images: Joi.array().items(Joi.string().uri()),
