@@ -5,18 +5,23 @@ import { stringify, parse } from 'json-buffer';
 
 import redisClient from './redis';
 
-const methods = [
-  'findOne',
+const selectMethods = [
   'findAll',
-  'findAndCount',
-  'findAndCountAll',
   'findByPk',
-  'query',
-  'all',
+  'findOne',
+  'count',
+  'findAndCountAll',
   'min',
   'max',
   'sum',
-  'count',
+  'findAndCount',
+  'query',
+  'all',
+];
+
+const changeMethods = [
+  'create',
+  'update',
 ];
 
 function desymbolize(o) {
@@ -47,7 +52,7 @@ export default function generateRedisModel(model: any, options: any = {}) {
   }
 
   async function run(cacheKey, method, ...args) {
-    if (!methods.includes(method)) {
+    if (!selectMethods.includes(method)) {
       throw new Error('Unsupported method');
     }
     if (!model[`org_${method}`]) {
@@ -139,10 +144,32 @@ export default function generateRedisModel(model: any, options: any = {}) {
     return result;
   }
   
-  methods.forEach(method => {
+  selectMethods.forEach(method => {
     const cacheKey = `sequelize:${model.name}:`
     model[`org_${method}`] = model[method]
     model[method] = async (...args) => run(cacheKey, method, ...args);
+  })
+
+  changeMethods.forEach(method => {
+    const cacheKey = `sequelize:${model.name}:`
+    model[`org_${method}`] = model[method]
+    model[method] = async (...args) => {
+      if (!changeMethods.includes(method)) {
+        throw new Error('Unsupported method');
+      }
+      if (!model[`org_${method}`]) {
+        throw new Error('Unsupported Method by Sequelize model');
+      }
+      
+      const result = await model[`org_${method}`](...args);
+      redisClient.keys(`${cacheKey}*`, function(err, replies) {
+        replies.forEach(function (reply, index) {
+          redisClient.del(reply)
+        });
+      });
+
+      return result;
+    };
   })
 
   return model;
