@@ -95,7 +95,9 @@ class S3FileUploader {
       const cipher = crypto.createCipher('aes256', config.secret_key);
       const hash = cipher.update(fileKey, 'utf8', 'hex') + cipher.final('hex');
       const mediaType = mimetype.split('/')[0];
-      const fileUrl = `${config.server_root_url}public/media/${mediaType}/${hash}/${fileKey}`;
+      let fileUrl = `${config.server_root_url}public/media/${mediaType}/${hash}/${fileKey}`;
+
+      if (mediaType === 'video') fileUrl += '/playlist.m3u8';
       
       return fileUrl;
     } catch(ex){

@@ -59,7 +59,9 @@ const postMedia = (sequelize: any, DataTypes: any) => {
           filePath = await fileUploader.uploadImageFromUrl(urls[i]);
         } else {
           filePath = urls[i].url;
-          thumbUrl = await fileUploader.uploadImageFromUrl(urls[i].thumb_url);
+          if (urls[i].thumb_url) {
+            thumbUrl = await fileUploader.uploadImageFromUrl(urls[i].thumb_url);
+          }
         }
         insertData.push ({ post_id, type, url: filePath, thumb: thumbUrl });
       }

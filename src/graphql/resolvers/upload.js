@@ -29,33 +29,36 @@ export default {
     upload: async (parent: any, args: any, context: any, info: any) => {
       const { file } = args
       const { createReadStream, filename, mimetype, encoding } = await file;
-      const stream = createReadStream()
+      let stream = createReadStream();
 
       if (mimetype.toLowerCase().startsWith('image')) {
         const url = await uploader.uploadFileFromStream(stream, filename, mimetype);
 
         return { url, filename, mimetype, encoding };
       } else if (mimetype.toLowerCase().startsWith('video')) {
-        const thumbDir = uploadPath + 'thumbnail/';
-        if (!fs.existsSync(thumbDir)){
-            fs.mkdirSync(thumbDir);
-        }
-        const thumbFileName = 'thumbnail_'+Date.now()+'.jpeg';
-        await asyncFFMpeg(ffmpeg(stream)
-          .takeScreenshots({
-            count: 1,
-            filename: thumbFileName,
-            timemarks: [ 5 ], // number of seconds
-            }, thumbDir, function(err) {
-          })
-        );
         const url = await uploader.uploadFileFromStream(stream, filename, mimetype);
 
-        const thumbUrl = await uploader.uploadFileFromStream(fs.createReadStream(thumbDir + thumbFileName), thumbFileName, 'image/jpeg');
+        let thumbUrl = null;
         try {
+          const thumbDir = uploadPath + 'thumbnail/';
+          if (!fs.existsSync(thumbDir)){
+              fs.mkdirSync(thumbDir);
+          }
+          const thumbFileName = 'thumbnail_'+Date.now()+'.jpeg';
+          stream = createReadStream();
+          await asyncFFMpeg(ffmpeg(stream)
+            .takeScreenshots({
+              count: 1,
+              filename: thumbFileName,
+              timemarks: [ 5 ], // number of seconds
+              }, thumbDir, function(err) {
+            })
+          );
+
+          thumbUrl = await uploader.uploadFileFromStream(fs.createReadStream(thumbDir + thumbFileName), thumbFileName, 'image/jpeg');
           fs.unlinkSync(thumbDir + thumbFileName);
         } catch (err) {
-          logger.error('Error on removing file:' + err);
+          logger.error('Error on generating thumbnail:' + err);
         }
 
         return { url, thumbUrl, filename, mimetype, encoding };
