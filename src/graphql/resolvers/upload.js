@@ -9,9 +9,8 @@ import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 import models from '../../models';
 import uploader from '../../middleware/uploader';
 import logger from '../../middleware/logger';
-import config from '../../config';
 
-const uploadPath = path.join(__dirname, config.env_mode === 'production'? '../public/upload/': '../../../public/upload/');
+const uploadPath = path.join(__dirname, '../../../public/upload/');
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
