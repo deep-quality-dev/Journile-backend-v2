@@ -264,7 +264,7 @@ export default {
         
         return post_id;
       } catch (err) {
-      console.log('user post error', err);
+        logger.info('user post error' + err);
         if (transaction) await transaction.rollback();
         throw err;
       }
