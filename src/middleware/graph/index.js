@@ -9,6 +9,7 @@ import models from '../../models';
 const Op = Sequelize.Op;
 
 const Distants = {
+  Root: 1,
   Read: 1,
   Issue: 1,
   Like: 2,
@@ -18,6 +19,7 @@ const Distants = {
 
 class GraphManager {
   g: any;
+  rootNode: any;
   users: any;
   channels: any;
   reads: any;
@@ -30,6 +32,7 @@ class GraphManager {
 
   constructor() {
     this.g = new ug.Graph();
+    this.rootNode = this.g.createNode('root', {name: 'Root Node'});
     this.users = {};
     this.channels = {};
     this.reads = {user: {}, channel: {}};
@@ -57,6 +60,9 @@ class GraphManager {
     });
     channels.forEach(channel => {
       this.channels[channel.id] = this.g.createNode('channel', channel);
+      if (channel.type === 0) {
+        this.g.createEdge('entry').link(this.rootNode, this.channels[channel.id]).setDistance(Distants.Root);
+      }
     });
     reads.forEach(read => {
       if (read.type === 0) {
@@ -90,9 +96,10 @@ class GraphManager {
   }
 
   findUsers(user_id: number, key: string, offset: number = 0, limit: number = 20) {
-    key = key.toLowerCase();
+    const entry = this.users[user_id] || this.rootNode;
 
-    let results = this.g.closest(this.users[user_id], {
+    key = key.toLowerCase();
+    let results = this.g.closest(entry, {
       compare: function(node) {
         return (node.entity === 'user' && (node.get('username').toLowerCase().indexOf(key) > -1 || node.get('first_name').toLowerCase().indexOf(key) > -1 || node.get('last_name').toLowerCase().indexOf(key) > -1))
           || (node.entity === 'channel' && (node.get('username').toLowerCase().indexOf(key) > -1 || node.get('name').toLowerCase().indexOf(key) > -1));
@@ -108,9 +115,10 @@ class GraphManager {
   }
 
   findPosts(user_id: number, key: string, type: number = -1, offset: number = 0, limit: number = 20) {
-    key = key.toLowerCase();
+    const entry = this.users[user_id] || this.rootNode;
 
-    let results = this.g.closest(this.users[user_id], {
+    key = key.toLowerCase();
+    let results = this.g.closest(entry, {
       compare: function(node) {
         return node.entity === 'post' && (type === -1 || node.get('type') === type)
           && (node.get('title').toLowerCase().indexOf(key) > -1 || node.get('description').toLowerCase().indexOf(key) > -1 || node.get('gammatags').toLowerCase().indexOf(key) > -1);

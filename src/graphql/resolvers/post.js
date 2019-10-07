@@ -30,7 +30,7 @@ const GammatagLimitLength = 20;
 const GammatagLimitCount = 5;
 const SpiderMaxContinuousLimit = 500;
 
-function getQueryOption(info: any, user: any) {
+function getQueryOption(user: any) {
   let option: any = {
     subQuery: false,
     nest: true,
@@ -112,8 +112,8 @@ async function rateGammatags(gammatags: Array<string>) {
   }
 }
 
-async function searchPosts(info: any, user: any, searchkey: string, offset: number, type: number = PostType.Any) {
-  let option = getQueryOption(info, user)
+async function searchPosts(user: any, searchkey: string, offset: number, type: number = PostType.Any) {
+  let option = getQueryOption(user)
   
   let where: any = { }, postIds: ?Array<number>;
   if (user) {
@@ -146,7 +146,7 @@ export default {
     getPosts: async (parent: any, params: any, context: any, info: any) => {
       const { date, isLater } = params
       const { user } = context
-      let option = getQueryOption(info, user)
+      let option = getQueryOption(user)
 
       let where: any = {};
       if (user) {
@@ -166,7 +166,7 @@ export default {
     getHotTopics: async (parent: any, params: any, context: any, info: any) => {
       const { count } = params
 
-      let option = getQueryOption(info)
+      let option = getQueryOption()
 
       option.order = [Sequelize.literal('"rate.like" DESC'), ['original_post_date', 'DESC']]
       option.limit = count || 4
@@ -178,7 +178,7 @@ export default {
     getUserPosts: async (parent: any, params: any, context: any, info: any) => {
       const { user_id, date, isLater } = params
       const { user } = context
-      let option = getQueryOption(info, user)
+      let option = getQueryOption(user)
 
       let where: any = { 'author_id': user_id };
       
@@ -193,7 +193,7 @@ export default {
     getChannelPosts: async (parent: any, params: any, context: any, info: any) => {
       const { channel_id, date, isLater } = params
       const { user } = context
-      let option = getQueryOption(info, user)
+      let option = getQueryOption(user)
 
       let where: any = { channel_id };
       
@@ -204,33 +204,40 @@ export default {
 
       return await models.Post.findAll({ ...option });
     },
+
+    searchPosts: async (parent: any, params: any, context: any, info: any) => {
+      const { searchkey, offset } = params
+      const { user } = context
+
+      return await searchPosts(user, searchkey, offset, PostType.Any);
+    },
     
     searchArticles: async (parent: any, params: any, context: any, info: any) => {
       const { searchkey, offset } = params
       const { user } = context
 
-      return await searchPosts(info, user, searchkey, offset, PostType.Article);
+      return await searchPosts(user, searchkey, offset, PostType.Article);
     },
     
     searchPhotos: async (parent: any, params: any, context: any, info: any) => {
       const { searchkey, offset } = params
       const { user } = context
 
-      return await searchPosts(info, user, searchkey, offset, PostType.Photo);
+      return await searchPosts(user, searchkey, offset, PostType.Photo);
     },
     
     searchVideos: async (parent: any, params: any, context: any, info: any) => {
       const { searchkey, offset } = params
       const { user } = context
 
-      return await searchPosts(info, user, searchkey, offset, PostType.Video);
+      return await searchPosts(user, searchkey, offset, PostType.Video);
     },
     
     searchLives: async (parent: any, params: any, context: any, info: any) => {
       const { searchkey, offset } = params
       const { user } = context
 
-      return await searchPosts(info, user, searchkey, offset, PostType.LIVE);
+      return await searchPosts(user, searchkey, offset, PostType.LIVE);
     },
   },
 
