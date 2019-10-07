@@ -17,6 +17,7 @@ import postHiddenSchema from './post_hidden';
 import postRateSchema from './post_rate';
 import postReportSchema from './post_report';
 import postSchema from './post';
+import profileSchema from './profile';
 import readSchema from './read';
 import scraperSchema from './scraper';
 import userSchema from './user';
@@ -52,6 +53,7 @@ export default [
   postRateSchema,
   postReportSchema,
   postSchema,
+  profileSchema,
   readSchema,
   scraperSchema,
   userSchema,

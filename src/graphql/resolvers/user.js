@@ -70,7 +70,7 @@ const sendActivationMail = async (user: any) => {
 
 export default {
   Query: {
-    me: async (parent: any, args: any, context: any ) => {
+    me: async (parent: any, params: any, context: any ) => {
       const { user } = context
       if (!user) {
         return null;
@@ -83,8 +83,8 @@ export default {
       return await models.User.findByPk(user.id, option);
     },
 
-    getUserByUsername: async (parent: any, args: any, context: any ) => {
-      const { username } = args
+    getUserByUsername: async (parent: any, params: any, context: any ) => {
+      const { username } = params
 
       const option = {
         include: [{ model: models.Country, as: 'country' }, { model: models.City, as: 'city' }],
@@ -94,30 +94,30 @@ export default {
       return await models.User.findOne(option);
     },
 
-    getUserActivity: async (parent: any, args: any, context: any ) => {
-      const { username } = args
+    getUserActivity: async (parent: any, params: any, context: any ) => {
+      const { username } = params
 
       const option = {
         nest: true,
         raw: true,
         attributes: [
           'id', 'username', 'email',
-          [ Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col("posts.id"))), "posts" ],
-          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col("reading.id"))), { "$reading.type$": 0 }, models.PostRate), 'reading' ],
-          [ Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col("reader.id"))), 'readers' ],
-          [ Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col("comment.id"))), 'comments' ],
-          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col("rate.id"))), { "$rate.status$": 1 }, models.PostRate), "like" ],
-          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col("rate.id"))), { "$rate.status$": 2 }, models.PostRate), "dislike" ],
-          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col("posts.id"))), { "$posts.reissued_id$": { [Op.ne]: null } }, models.PostRate), "reissue" ],
+          [ Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('posts.id'))), 'posts' ],
+          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('reading.id'))), { '$reading.type$': 0 }, models.PostRate), 'reading' ],
+          [ Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('reader.id'))), 'readers' ],
+          [ Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('comment.id'))), 'comments' ],
+          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('rate.id'))), { '$rate.status$': 1 }, models.PostRate), 'like' ],
+          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('rate.id'))), { '$rate.status$': 2 }, models.PostRate), 'dislike' ],
+          [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('posts.id'))), { '$posts.reissued_id$': { [Op.ne]: null } }, models.PostRate), 'reissue' ],
         ],
         include: [
           { model: models.Post, required: false, attributes: [] },
-          { model: models.Read, as: 'reading', required: false, attributes: [], where: { "$reading.type$": 0, "$reading.status$": 1 } },
-          { model: models.Read, as: 'reader', required: false, attributes: [], where: { "$reading.type$": 0, "$reading.status$": 1 } },
+          { model: models.Read, as: 'reading', required: false, attributes: [], where: { '$reading.type$': 0, '$reading.status$': 1 } },
+          { model: models.Read, as: 'reader', required: false, attributes: [], where: { '$reading.type$': 0, '$reading.status$': 1 } },
           { model: models.PostComment, as: 'comment', required: false, attributes: [] },
           { model: models.PostRate, as: 'rate', required: false, attributes: [] },
         ],
-        group: ["user.id"],
+        group: ['user.id'],
         where: { username },
       }
 
@@ -247,22 +247,22 @@ export default {
         Joi.assert({ email, password, username, first_name, last_name, phone_number }, schema);
       } catch (err) { throw new UserInputError(err.details[0].message) }
 
-      const duplication = await models.User.findOne({where: { [Op.or]: [{ email} , { username }] }});
+      const duplication = await models.User.findOne({where: { [Op.or]: [{ email } , { username }] }});
       if (duplication) {
         throw new UserInputError(`Email or username is already exist`)
       }
 
       // check location
-      let clientip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || (req.connection["socket"] ? req.connection["socket"].remoteAddress : null);
+      let clientip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || (req.connection['socket'] ? req.connection['socket'].remoteAddress : null);
       clientip = ((clientip == null) ? 'undefined' : (clientip == '::1' ? '127.0.0.1' : clientip));
       
       let city_id, country_id, geo = geoip.lookup(clientip);
       if (geo) {
-        const city_name = geo.city || "Unknown";
+        const city_name = geo.city || 'Unknown';
         const city = await models.City.findOne({ where: { name: { [Op.like]: `%${city_name}%` } }});
         if (city) city_id = city.id;
 
-        const country_code = geo.country || "Unknown";
+        const country_code = geo.country || 'Unknown';
         let country = await models.Country.findOne({ where: { country_code }});
         if (country) country_id = country.id;
       }

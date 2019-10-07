@@ -16,6 +16,7 @@ import postHiddenResolvers from './post_hidden';
 import postRateResolvers from './post_rate';
 import postReportResolvers from './post_report';
 import postResolvers from './post';
+import profileResolvers from './profile';
 import readResolvers from './read';
 import scraperResolvers from './scraper';
 import userResolvers from './user';
@@ -43,6 +44,7 @@ export default [
   postRateResolvers,
   postReportResolvers,
   postResolvers,
+  profileResolvers,
   readResolvers,
   scraperResolvers,
   userResolvers,
