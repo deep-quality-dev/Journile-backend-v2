@@ -16,12 +16,14 @@ const Op = Sequelize.Op;
 
 
 const PostType = {
+  Any: -1,
   Article: 0,
   Video: 1,
   Photo: 2,
   Location: 3,
   Poll: 4,
   Link: 5,
+  LIVE: 6,
 };
 
 const GammatagLimitLength = 20;
@@ -110,6 +112,35 @@ async function rateGammatags(gammatags: Array<string>) {
   }
 }
 
+async function searchPosts(info: any, user: any, searchkey: string, offset: number, type: number = PostType.Any) {
+  let option = getQueryOption(info, user)
+  
+  let where: any = { }, postIds: ?Array<number>;
+  if (user) {
+    postIds = graph.findPosts(user.id, searchkey, type, offset);
+    where['$post.id$'] = postIds;
+  } else {
+    where = { type, [Op.or]: [
+      { title: { [Op.like]: `%${searchkey}%` } },
+      { description: { [Op.like]: `%${searchkey}%` } },
+      { gammatags: { [Op.like]: `%${searchkey}%` } }
+    ]};
+    option.offset = offset;
+  }
+  
+  option.where = where;
+
+  let posts = await models.Post.findAll(option);
+  if (postIds) {
+    const ids = postIds;
+    posts = _.sortBy(posts, function(post){
+      return ids.indexOf(post.id)
+    });
+  }
+
+  return posts;
+}
+
 export default {
   Query: {
     getPosts: async (parent: any, params: any, context: any, info: any) => {
@@ -177,32 +208,29 @@ export default {
     searchArticles: async (parent: any, params: any, context: any, info: any) => {
       const { searchkey, offset } = params
       const { user } = context
-      let option = getQueryOption(info, user)
 
-      let where: any = { }, postIds: ?Array<number>;
-      if (user) {
-        postIds = graph.findPosts(user.id, searchkey, PostType.Article, offset);
-        where['$post.id$'] = postIds;
-      } else {
-        where = { type: 0, [Op.or]: [
-          { title: { [Op.like]: `%${searchkey}%` } },
-          { description: { [Op.like]: `%${searchkey}%` } },
-          { gammatags: { [Op.like]: `%${searchkey}%` } }
-        ]};
-        option.offset = offset;
-      }
-      
-      option.where = where;
+      return await searchPosts(info, user, searchkey, offset, PostType.Article);
+    },
+    
+    searchPhotos: async (parent: any, params: any, context: any, info: any) => {
+      const { searchkey, offset } = params
+      const { user } = context
 
-      let posts = await models.Post.findAll({ ...option });
-      if (postIds) {
-        const ids = postIds;
-        posts = _.sortBy(posts, function(post){
-          return ids.indexOf(post.id)
-        });
-      }
+      return await searchPosts(info, user, searchkey, offset, PostType.Photo);
+    },
+    
+    searchVideos: async (parent: any, params: any, context: any, info: any) => {
+      const { searchkey, offset } = params
+      const { user } = context
 
-      return posts;
+      return await searchPosts(info, user, searchkey, offset, PostType.Video);
+    },
+    
+    searchLives: async (parent: any, params: any, context: any, info: any) => {
+      const { searchkey, offset } = params
+      const { user } = context
+
+      return await searchPosts(info, user, searchkey, offset, PostType.LIVE);
     },
   },
 

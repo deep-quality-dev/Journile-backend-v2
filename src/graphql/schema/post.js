@@ -74,6 +74,9 @@ export default gql`
     getUserPosts(user_id: ID!, date: Date, isLater: Boolean): [Post!]! @checkAuth
     getChannelPosts(channel_id: ID!, date: Date, isLater: Boolean): [Post!]! @checkAuth
     searchArticles(searchkey: String, offset: Int = 0): [Post!]! @checkAuth
+    searchPhotos(searchkey: String, offset: Int = 0): [Post!]! @checkAuth
+    searchVideos(searchkey: String, offset: Int = 0): [Post!]! @checkAuth
+    searchLives(searchkey: String, offset: Int = 0): [Post!]! @checkAuth
   }
 
   extend type Mutation {
