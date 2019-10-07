@@ -89,7 +89,7 @@ class GraphManager {
 
   }
 
-  findUsers(user_id: number, key: string, skip: number = 0, limit: number = 20) {
+  findUsers(user_id: number, key: string, offset: number = 0, limit: number = 20) {
     key = key.toLowerCase();
 
     let results = this.g.closest(this.users[user_id], {
@@ -100,25 +100,26 @@ class GraphManager {
     });
   
     let users = [];
-    for (let i=skip; i<skip+limit && i<results.length; i++) {
+    for (let i=offset; i<offset+limit && i<results.length; i++) {
       users.push({id: results[i].end().get('id'), type: results[i].end().entity});
     }
 
     return users;
   }
 
-  findPosts(user_id: number, key: string, skip: number = 0, limit: number = 20) {
+  findPosts(user_id: number, key: string, type: number = -1, offset: number = 0, limit: number = 20) {
     key = key.toLowerCase();
 
     let results = this.g.closest(this.users[user_id], {
       compare: function(node) {
-        return node.entity === 'post' && (node.get('title').toLowerCase().indexOf(key) > -1 || node.get('description').toLowerCase().indexOf(key) > -1 || node.get('gammatags').toLowerCase().indexOf(key) > -1);
+        return node.entity === 'post' && (type === -1 || node.get('type') === type)
+          && (node.get('title').toLowerCase().indexOf(key) > -1 || node.get('description').toLowerCase().indexOf(key) > -1 || node.get('gammatags').toLowerCase().indexOf(key) > -1);
       },
       minDepth: 2,
     });
   
     let posts = [];
-    for (let i=skip; i<skip+limit && i<results.length; i++) {
+    for (let i=offset; i<offset+limit && i<results.length; i++) {
       posts.push(results[i].end().get('id'));
     }
 

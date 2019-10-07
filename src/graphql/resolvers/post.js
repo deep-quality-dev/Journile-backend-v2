@@ -2,12 +2,14 @@
 
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
 import Sequelize from 'sequelize';
-import franc from "franc";
-import langs from "langs";
+import franc from 'franc';
+import langs from 'langs';
 import Joi from '@hapi/joi';
+import _ from 'lodash';
 
 import models from '../../models';
 import fileUploader from '../../middleware/uploader';
+import graph from '../../middleware/graph';
 import logger from '../../middleware/logger';
 
 const Op = Sequelize.Op;
@@ -33,9 +35,9 @@ function getQueryOption(info: any, user: any) {
     raw: true,
     attributes: {
       include: [
-        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("bookmark.status")), 0): Sequelize.literal(0), "bookmark" ],
-        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("hidden.status")), 0): Sequelize.literal(0), 'hidden' ],
-        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col("report.status")), 0): Sequelize.literal(0), 'report' ],
+        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col('bookmark.status')), 0): Sequelize.literal(0), 'bookmark' ],
+        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col('hidden.status')), 0): Sequelize.literal(0), 'hidden' ],
+        [ user? Sequelize.fn('COALESCE', Sequelize.fn('MAX', Sequelize.col('report.status')), 0): Sequelize.literal(0), 'report' ],
       ],
     },
     include: [
@@ -43,40 +45,40 @@ function getQueryOption(info: any, user: any) {
       { model: models.Channel, as: 'channel' },
       { model: models.User, as: 'author' },
       { model: models.PostMedia, as: 'media', attributes: [
-        [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.col("media.url")), { "$media.type$": 0 }, models.PostMedia), "images" ],
-        [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.fn('JSON_BUILD_OBJECT', 'url', Sequelize.col("media.url"), 'thumb_url', Sequelize.col("media.thumb"))), { "$media.type$": 1 }, models.PostMedia), "videos" ],
+        [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.col('media.url')), { '$media.type$': 0 }, models.PostMedia), 'images' ],
+        [ Sequelize.filter(Sequelize.fn('ARRAY_AGG', Sequelize.fn('JSON_BUILD_OBJECT', 'url', Sequelize.col('media.url'), 'thumb_url', Sequelize.col('media.thumb'))), { '$media.type$': 1 }, models.PostMedia), 'videos' ],
       ], noPrimaryKey: true },
       { model: models.PostRate, as: 'rate', attributes: [
-        [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 1 }, models.PostRate), "like" ],
-        [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("rate.id")), { "$rate.status$": 2 }, models.PostRate), "dislike" ],
-        [ user? Sequelize.fn('COALESCE', Sequelize.filter(Sequelize.fn("MAX", Sequelize.col("rate.status")), { "$rate.user_id$": user.id }, models.PostRate), 0): Sequelize.literal(0), "status" ]
+        [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col('rate.id')), { '$rate.status$': 1 }, models.PostRate), 'like' ],
+        [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col('rate.id')), { '$rate.status$': 2 }, models.PostRate), 'dislike' ],
+        [ user? Sequelize.fn('COALESCE', Sequelize.filter(Sequelize.fn('MAX', Sequelize.col('rate.status')), { '$rate.user_id$': user.id }, models.PostRate), 0): Sequelize.literal(0), 'status' ]
       ], noPrimaryKey: true },
       { model: models.PostComment, as: 'reply', attributes: [
-        [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col("reply.id")), { "$reply.status$": 0 }, models.PostComment), "count" ],
+        [ Sequelize.filter(Sequelize.fn('COUNT', Sequelize.col('reply.id')), { '$reply.status$': 0 }, models.PostComment), 'count' ],
       ], noPrimaryKey: true },
     ],
     order: [['original_post_date', 'DESC']],
     limit: 20,
-    group: ["post.id", "category.id", "channel.id", "author.id"],
+    group: ['post.id', 'category.id', 'channel.id', 'author.id'],
   }
 
   if (user) {
-    option.include.push({ model: models.Bookmark, as: 'bookmark', required: false, attributes: [], where: { "$bookmark.user_id$": user.id } })
-    option.include.push({ model: models.PostHidden, as: 'hidden', required: false, attributes: [], where: { "$hidden.user_id$": user.id } })
-    option.include.push({ model: models.PostReport, as: 'report', required: false, attributes: [], where: { "$report.user_id$": user.id } })
+    option.include.push({ model: models.Bookmark, as: 'bookmark', required: false, attributes: [], where: { '$bookmark.user_id$': user.id } })
+    option.include.push({ model: models.PostHidden, as: 'hidden', required: false, attributes: [], where: { '$hidden.user_id$': user.id } })
+    option.include.push({ model: models.PostReport, as: 'report', required: false, attributes: [], where: { '$report.user_id$': user.id } })
   }
 
   return option
 }
 
 function languageFinder(description: string) {
-  const detailsWithoutHtmlTags = description.replace(/<\/?[^>]+(>|$)/g, "");
+  const detailsWithoutHtmlTags = description.replace(/<\/?[^>]+(>|$)/g, '');
   const lang3 = franc(detailsWithoutHtmlTags);
-  let language = langs.where("3", lang3);
-  if (language && language["1"]) {
-    return language["1"];
+  let language = langs.where('3', lang3);
+  if (language && language['1']) {
+    return language['1'];
   } else {
-    return "en";
+    return 'en';
   }
 }
 
@@ -84,7 +86,7 @@ function filterGammatags(gammatags: Array<string>) {
   gammatags = gammatags || []
   for (var i=0; i<gammatags.length; i++) {
     var tag = gammatags[i];
-    tag = tag.replace(/[^a-zA-Z\d]/g, "").toLowerCase();
+    tag = tag.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
     gammatags[i] = tag;
   }
   
@@ -119,11 +121,11 @@ export default {
       if (user) {
         // private query
       } else {
-        where = { "$channel.type$": 0 }
+        where = { '$channel.type$': 0 }
       }
 
       if (date) {
-        where["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
+        where['$post.original_post_date$'] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
       }
       option.where = where;
 
@@ -137,7 +139,7 @@ export default {
 
       option.order = [Sequelize.literal('"rate.like" DESC'), ['original_post_date', 'DESC']]
       option.limit = count || 4
-      option.where = { "status": 0 }
+      option.where = { 'status': 0 }
 
       return await models.Post.findAll({ ...option });
     },
@@ -147,10 +149,10 @@ export default {
       const { user } = context
       let option = getQueryOption(info, user)
 
-      let where: any = { "author_id": user_id };
+      let where: any = { 'author_id': user_id };
       
       if (date) {
-        where["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
+        where['$post.original_post_date$'] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
       }
       option.where = where;
 
@@ -165,11 +167,42 @@ export default {
       let where: any = { channel_id };
       
       if (date) {
-        where["$post.original_post_date$"] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
+        where['$post.original_post_date$'] = isLater? { [Op.gte]: date } : { [Op.lt]: date }
       }
       option.where = where;
 
       return await models.Post.findAll({ ...option });
+    },
+    
+    searchArticles: async (parent: any, params: any, context: any, info: any) => {
+      const { searchkey, offset } = params
+      const { user } = context
+      let option = getQueryOption(info, user)
+
+      let where: any = { }, postIds: ?Array<number>;
+      if (user) {
+        postIds = graph.findPosts(user.id, searchkey, PostType.Article, offset);
+        where['$post.id$'] = postIds;
+      } else {
+        where = { type: 0, [Op.or]: [
+          { title: { [Op.like]: `%${searchkey}%` } },
+          { description: { [Op.like]: `%${searchkey}%` } },
+          { gammatags: { [Op.like]: `%${searchkey}%` } }
+        ]};
+        option.offset = offset;
+      }
+      
+      option.where = where;
+
+      let posts = await models.Post.findAll({ ...option });
+      if (postIds) {
+        const ids = postIds;
+        posts = _.sortBy(posts, function(post){
+          return ids.indexOf(post.id)
+        });
+      }
+
+      return posts;
     },
   },
 
@@ -317,7 +350,7 @@ export default {
         }
 
         language = languageFinder(description);
-        gammatags = [scraper.username].concat(gammatags);
+        // gammatags = [scraper.username].concat(gammatags);
         gammatags = filterGammatags(gammatags);
       } catch (err) { throw err }
 
