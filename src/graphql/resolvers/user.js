@@ -41,7 +41,7 @@ const activeUser = async (user: any) => {
 
     await transaction.commit();
 
-    graph.addUser(user.get({ plain: true }));
+    graph.addUser(user);
   } catch (err) {
     if (transaction) await transaction.rollback();
     throw err;
