@@ -3,6 +3,7 @@
 import { AuthenticationError, UserInputError } from 'apollo-server-express';
 
 import models from '../../models';
+import graph from '../../middleware/graph';
 
 export default {
   Query: {
@@ -46,7 +47,8 @@ export default {
         throw new UserInputError('User not exist.')
       }
 
-      await models.Read.upsert({user_id: user.id, reading_id: user_id, type: 0, status: reading}, { where: {user_id: user.id, reading_id: user_id, type: 0 } })
+      const read = await models.Read.upsert({user_id: user.id, reading_id: user_id, type: 0, status: reading}, { where: {user_id: user.id, reading_id: user_id, type: 0 } })
+      graph.readUser(read.get({ plain: true }));
 
       return true;
     },
@@ -61,7 +63,8 @@ export default {
         throw new UserInputError('Channel not exist.')
       }
 
-      await models.Read.upsert({user_id: user.id, reading_id: channel_id, type: 1, status: reading}, { where: {user_id: user.id, reading_id: channel_id, type: 1 } })
+      const read = await models.Read.upsert({user_id: user.id, reading_id: channel_id, type: 1, status: reading}, { where: {user_id: user.id, reading_id: channel_id, type: 1 } })
+      graph.readChannel(read.get({ plain: true }));
 
       return true;
     }

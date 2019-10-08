@@ -315,10 +315,11 @@ export default {
         logger.info('--------------------------------------------------------');
 
         await rateGammatags(gammatags);
+        graph.userPost(result.get({ plain: true }));
         
         return post_id;
       } catch (err) {
-        logger.info('user post error' + err);
+        logger.error('user post error' + err);
         if (transaction) await transaction.rollback();
         throw err;
       }
@@ -411,6 +412,7 @@ export default {
         logger.info('--------------------------------------------------------');
 
         await rateGammatags(gammatags);
+        graph.channelPost(result.get({ plain: true }));
         
         return post_id;
       } catch (err) {
