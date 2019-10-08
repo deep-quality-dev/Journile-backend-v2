@@ -5,6 +5,7 @@ import Sequelize from 'sequelize';
 import _ from 'lodash';
 
 import models from '../../models';
+import logger from '../logger';
 
 const Op = Sequelize.Op;
 
@@ -92,7 +93,6 @@ class GraphManager {
     postComments.forEach(postComment => {
       this.comments[postComment.id] = this.g.createEdge('comment').link(this.users[postComment.user_id], this.posts[postComment.post_id]).setDistance(Distants.Comment);
     });
-
   }
 
   findUsers(user_id: number, key: string, offset: number = 0, limit: number = 20) {
@@ -132,6 +132,152 @@ class GraphManager {
     }
 
     return posts;
+  }
+
+
+  addUser(user: any) {
+    if (!user || this.users[user.id]) {
+      logger.error('graph add User error: ' + (!user)? 'null value of user': 'duplicated user ' + user);
+      return;
+    }
+    this.users[user.id] = this.g.createNode('user', user);
+  }
+
+  addChannel(channel: any) {
+    if (!channel || this.channels[channel.id]) {
+      logger.error('graph add Chanel error: ' + (!channel)? 'null value of channel': 'duplicated channel ' + channel);
+      return;
+    }
+    this.channels[channel.id] = this.g.createNode('channel', channel);
+    if (channel.type === 0) {
+      this.g.createEdge('entry').link(this.rootNode, this.channels[channel.id]).setDistance(Distants.Root);
+    }
+  }
+
+  readUser(read: any) {
+    if (!read) {
+      logger.error('graph read User error: null value of read');
+      return;
+    }
+    if (read.status === 0) {
+      if (!this.reads.user[read.id]) {
+        logger.error('graph read User error: ' + 'not existing read - ' + read);
+        return;
+      }
+
+      this.reads.user[read.id].unlink();
+      delete this.reads.user[read.id];
+    } else {
+      if (!this.reads.user[read.id]) {
+        this.reads.user[read.id] = this.g.createEdge('read', {type: 'user'});
+      }
+      this.reads.user[read.id].link(this.users[read.user_id], this.users[read.reading_id]).setDistance(Distants.Read);
+    }
+  }
+
+  readChannel(read: any) {
+    if (!read) {
+      logger.error('graph read Channel error: null value of read');
+      return;
+    }
+    if (read.status === 0) {
+      if (!this.reads.channel[read.id]) {
+        logger.error('graph read Channel error: ' + 'not existing read - ' + read);
+        return;
+      }
+
+      this.reads.channel[read.id].unlink();
+      delete this.reads.channel[read.id];
+    } else {
+      if (!this.reads.channel[read.id]) {
+        this.reads.channel[read.id] = this.g.createEdge('read', {type: 'channel'});
+      }
+      this.reads.channel[read.id].link(this.users[read.user_id], this.channels[read.reading_id]).setDistance(Distants.Read);
+    }
+  }
+
+  addGammatag(gammatag: any) {
+    if (!gammatag || this.gammatags[gammatag.name]) {
+      logger.error('graph add gammatag error: ' + (!gammatag)? 'null value of gammatag': 'duplicated gammatag ' + gammatag);
+      return;
+    }
+    this.gammatags[gammatag.name] = this.g.createNode('gammatag', gammatag);
+  }
+
+  userPost(post: any) {
+    if (!post || this.posts[post.id]) {
+      logger.error('graph add post error: ' + (!post)? 'null value of gammatag': 'duplicated post ' + post);
+      return;
+    }
+    this.posts[post.id] = this.g.createNode('post', post);
+    this.issues.user[post.id] = this.g.createEdge('issue', {type: 'user'}).link(this.users[post.author_id], this.posts[post.id]).setDistance(Distants.Issue);
+    const tags = _.compact(post.gammatags.split(','));
+    tags.forEach(tag => {
+      if (!this.gammatags[tag]) {
+        logger.error('graph add post error: can\'t find gammatag - ' + tag);
+        return;
+      }
+      this.tags[tag] = this.g.createEdge('tag').link(this.gammatags[tag], this.posts[post.id]).setDistance(Distants.Tag);
+    });
+  }
+
+  channelPost(post: any) {
+    if (!post || this.posts[post.id]) {
+      logger.error('graph add post error: ' + (!post)? 'null value of gammatag': 'duplicated post ' + post);
+      return;
+    }
+    this.posts[post.id] = this.g.createNode('post', post);
+    this.issues.channel[post.id] = this.g.createEdge('issue', {type: 'channel'}).link(this.channels[post.channel_id], this.posts[post.id]).setDistance(Distants.Issue);
+    const tags = _.compact(post.gammatags.split(','));
+    tags.forEach(tag => {
+      if (!this.gammatags[tag]) {
+        logger.error('graph add post error: can\'t find gammatag - ' + tag);
+        return;
+      }
+      this.tags[tag] = this.g.createEdge('tag').link(this.gammatags[tag], this.posts[post.id]).setDistance(Distants.Tag);
+    });
+  }
+
+  ratePost(postRate: any) {
+    if (!postRate) {
+      logger.error('graph rate post error: null value of rate');
+      return;
+    }
+    if (postRate.status === 0) {
+      if (!this.likes[postRate.id]) {
+        logger.error('graph rate post error: ' + 'not existing rate - ' + postRate);
+        return;
+      }
+
+      this.likes[postRate.id].unlink();
+      delete this.likes[postRate.id];
+    } else {
+      if (!this.likes[postRate.id]) {
+        this.likes[postRate.id] = this.g.createEdge('like');
+      }
+      this.likes[postRate.id].link(this.users[postRate.user_id], this.posts[postRate.post_id]).setDistance(Distants.Like);
+    }
+  }
+
+  commentPost(postComment: any) {
+    if (!postComment) {
+      logger.error('graph comment post error: null value of comment');
+      return;
+    }
+    if (postComment.status === 0) {
+      if (!this.comments[postComment.id]) {
+        logger.error('graph comment post error: ' + 'not existing comment - ' + postComment);
+        return;
+      }
+
+      this.comments[postComment.id].unlink();
+      delete this.comments[postComment.id];
+    } else {
+      if (!this.comments[postComment.id]) {
+        this.comments[postComment.id] = this.g.createEdge('comment');
+      }
+      this.comments[postComment.id].link(this.users[postComment.user_id], this.posts[postComment.post_id]).setDistance(Distants.Comment);
+    }
   }
 }
 
