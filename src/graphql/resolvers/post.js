@@ -115,28 +115,14 @@ async function rateGammatags(gammatags: Array<string>) {
 async function searchPosts(user: any, searchkey: string, offset: number, type: number = PostType.Any) {
   let option = getQueryOption(user)
   
-  let where: any = { }, postIds: ?Array<number>;
-  if (user) {
-    postIds = graph.findPosts(user.id, searchkey, type, offset);
-    where['$post.id$'] = postIds;
-  } else {
-    where = { type, [Op.or]: [
-      { title: { [Op.like]: `%${searchkey}%` } },
-      { description: { [Op.like]: `%${searchkey}%` } },
-      { gammatags: { [Op.like]: `%${searchkey}%` } }
-    ]};
-    option.offset = offset;
-  }
+  const postIds = graph.findPosts(user? user.id: -1, searchkey, type, offset);
   
-  option.where = where;
+  option.where = {'$post.id$': postIds};
 
   let posts = await models.Post.findAll(option);
-  if (postIds) {
-    const ids = postIds;
-    posts = _.sortBy(posts, function(post){
-      return ids.indexOf(post.id)
-    });
-  }
+  posts = _.sortBy(posts, function(post){
+    return postIds.indexOf(post.id)
+  });
 
   return posts;
 }
