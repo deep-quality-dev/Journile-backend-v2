@@ -20,6 +20,7 @@ const selectMethods = [
 ];
 
 const changeMethods = [
+  'bulkCreate',
   'create',
   'update',
 ];

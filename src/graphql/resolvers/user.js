@@ -37,11 +37,14 @@ const activeUser = async (user: any) => {
     const readChannels = GIChannels.map(channel => {
       return {user_id: user.id, reading_id: channel.id, type: 1};
     })
-    await models.Read.build(readChannels);
+    const userReads = await models.Read.bulkCreate(readChannels);
 
     await transaction.commit();
 
     graph.addUser(user);
+    userReads.forEach(read => {
+      graph.readChannel(read.get({ plain: true }));
+    });
   } catch (err) {
     if (transaction) await transaction.rollback();
     throw err;
