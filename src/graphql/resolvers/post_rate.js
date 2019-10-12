@@ -4,6 +4,7 @@ import { AuthenticationError, UserInputError } from 'apollo-server-express';
 import Joi from '@hapi/joi';
 
 import models from '../../models';
+import graph from '../../middleware/graph';
 
 export default {
   Mutation: {
@@ -30,8 +31,10 @@ export default {
 
       let postRate = await models.PostRate.findOne({ where: { post_id, user_id: user.id } });
       if (postRate) {
-        if (postRate.status != userRate)
-          await models.PostRate.update({ status: userRate }, { where: { id: postRate.id } })
+        if (postRate.status != userRate) {
+          const result = await models.PostRate.update({ status: userRate }, { where: { id: postRate.id } });
+          graph.ratePost(result.get({ plain: true }));
+        }
         return true
       } else {
         postRate = await models.PostRate.create({
@@ -39,6 +42,7 @@ export default {
           user_id: user.id,
           status: userRate,
         })
+        graph.ratePost(postRate.get({ plain: true }));
 
         return !!postRate
       }

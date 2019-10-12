@@ -10,6 +10,7 @@ import config from '../../config';
 import models from '../../models';
 import { authenticateUser } from '../../middleware/passport';
 import mailer from '../../middleware/mailer';
+import graph from '../../middleware/graph';
 
 const Op = Sequelize.Op;
 
@@ -32,8 +33,18 @@ const activeUser = async (user: any) => {
     await models.User.update({ status: 1}, { where: { id: user.id }, transaction });
     await models.Activation.update({ status: 1 }, { where: { id: user.activation.id }, transaction });
     await models.UserSetting.create({ user_id: user.id }, { transaction });
+    const GIChannels = await models.Channel.findAll({ where: { type: 0 }, order: [['id', 'ASC']] });
+    const readChannels = GIChannels.map(channel => {
+      return {user_id: user.id, reading_id: channel.id, type: 1};
+    })
+    const userReads = await models.Read.bulkCreate(readChannels);
 
     await transaction.commit();
+
+    graph.addUser(user);
+    userReads.forEach(read => {
+      graph.readChannel(read.get({ plain: true }));
+    });
   } catch (err) {
     if (transaction) await transaction.rollback();
     throw err;

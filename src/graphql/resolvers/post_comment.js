@@ -5,6 +5,7 @@ import { fieldsList } from 'graphql-fields-list';
 import Joi from '@hapi/joi';
 
 import models from '../../models';
+import graph from '../../middleware/graph';
 
 function getQueryOption(info: any) {
   const fields = fieldsList(info);
@@ -70,6 +71,7 @@ export default {
         content,
         reply_id,
       })
+      graph.ratePost(postComment.get({ plain: true }));
 
       return !!postComment
     },

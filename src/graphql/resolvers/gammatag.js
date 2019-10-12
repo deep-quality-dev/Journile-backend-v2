@@ -4,6 +4,7 @@ import { AuthenticationError, UserInputError } from 'apollo-server-express';
 import Sequelize from 'sequelize';
 
 import models from '../../models';
+import graph from '../../middleware/graph';
 
 const Op = Sequelize.Op;
 
@@ -50,6 +51,7 @@ export default {
           name,
           rate: 0,
         })
+        graph.addGammatag(gammatag.get({ plain: true }));
 
         return true;
       } catch (err) {
