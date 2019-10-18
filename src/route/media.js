@@ -44,7 +44,7 @@ router.route('/video/:hash/:filename/:key')
         return;
       }
       
-      const url = `${config.wowza_server_root_url}video/_definst_/mp4:stream/${req.params.filename}/${req.params.key}`;
+      const url = `${config.wowza_server_root_url}/video/_definst_/mp4:stream/${req.params.filename}/${req.params.key}`;
       axios({ method: 'get', url, responseType: 'stream' }).then(result => result.data.pipe(res));
     } catch (err) {
       logger.error('Error on router.public.media.get' + err);

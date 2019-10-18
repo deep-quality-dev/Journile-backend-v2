@@ -46,8 +46,9 @@ if (config.ssl) {
   // Assumes certificates are in .ssl folder from package root. Make sure the files are secured.
   server = https.createServer(
     {
-      // key: fs.readFileSync(`./ssl/server.key`),
-      // cert: fs.readFileSync(`./ssl/server.crt`)
+      key: fs.readFileSync(path.join(__dirname, './ssl/server.key')),
+      ca: fs.readFileSync(path.join(__dirname, './ssl/server.ca-bundle')),
+      cert: fs.readFileSync(path.join(__dirname, './ssl/server.crt'))
     },
     app
   )

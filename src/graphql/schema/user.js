@@ -16,8 +16,8 @@ export default graphqls2s.transpileSchema(`
     phone_number: String @isAuth
     signup_type: Int! @isAuth
     level: Int!
-    photo: String
-    cover_image: String
+    photo: String @URL
+    cover_image: String @URL
     site_url: String
     country: Country
     city: City
