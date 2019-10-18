@@ -24,7 +24,7 @@ class S3FileUploader {
     {
       if(!url || typeof url != 'string') throw new Error('Missing parameter \'url\'.');
 
-      if (url.startsWith(`${config.server_root_url}public/media/`)) {
+      if (url.startsWith(`${config.server_root_url}/public/media/`)) {
         // already uploaded
         return url;
       }
@@ -55,7 +55,7 @@ class S3FileUploader {
       
       const cipher = crypto.createCipher('aes256', config.secret_key);
       const hash = cipher.update(fileKey, 'utf8', 'hex') + cipher.final('hex');
-      const fileUrl = `${config.server_root_url}public/media/image/${hash}/${fileKey}`;
+      const fileUrl = `/public/media/image/${hash}/${fileKey}`;
 
       return fileUrl;
     } catch(ex){
@@ -80,7 +80,7 @@ class S3FileUploader {
       
       const cipher = crypto.createCipher('aes256', config.secret_key);
       const hash = cipher.update(fileKey, 'utf8', 'hex') + cipher.final('hex');
-      let fileUrl = `${config.server_root_url}public/media/video/${hash}/${fileKey}/playlist.m3u8`;
+      let fileUrl = `/public/media/video/${hash}/${fileKey}/playlist.m3u8`;
       
       return fileUrl;
     } catch(ex){
@@ -119,7 +119,7 @@ class S3FileUploader {
       const cipher = crypto.createCipher('aes256', config.secret_key);
       const hash = cipher.update(fileKey, 'utf8', 'hex') + cipher.final('hex');
       const mediaType = mimetype.split('/')[0];
-      let fileUrl = `${config.server_root_url}public/media/${mediaType}/${hash}/${fileKey}`;
+      let fileUrl = `/public/media/${mediaType}/${hash}/${fileKey}`;
 
       if (mediaType === 'video') fileUrl += '/playlist.m3u8';
       

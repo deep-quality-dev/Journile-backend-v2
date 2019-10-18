@@ -10,9 +10,9 @@ export default gql`
     username: String!
     first_name: String
     last_name: String
-    logo: String
-    photo: String
-    cover_image: String
+    logo: String @URL
+    photo: String @URL
+    cover_image: String @URL
     level: Int!
     description: String
     site_url: String

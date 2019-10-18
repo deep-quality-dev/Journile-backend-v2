@@ -8,8 +8,8 @@ export default graphqls2s.transpileSchema(`
     name: String!
     username: String!
     email: String
-    logo: String
-    cover_image: String
+    logo: String @URL
+    cover_image: String @URL
     site_url: String
     country: Country!
     type: Int

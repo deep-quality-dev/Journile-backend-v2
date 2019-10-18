@@ -10,12 +10,12 @@ export default gql`
   }
 
   type VideoData {
-    url: String!
-    thumb_url: String
+    url: String! @URL
+    thumb_url: String @URL
   }
 
   type PostMediaDetail {
-    images: [String!]
+    images: [String!] @URL
     videos: [VideoData!]
   }
 
@@ -27,7 +27,7 @@ export default gql`
     id: ID!
     title: String!
     description: String
-    cover_image: String
+    cover_image: String @URL
     type: Int!
     original_url: String
     original_post_date: Date!

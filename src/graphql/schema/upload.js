@@ -4,8 +4,8 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
   type File {
-    url: String!
-    thumbUrl: String,
+    url: String! @URL
+    thumbUrl: String, @URL
     filename: String!
     mimetype: String!
     encoding: String!
