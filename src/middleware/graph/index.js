@@ -104,6 +104,7 @@ class GraphManager {
         return (node.entity === 'user' && (node.get('username').toLowerCase().indexOf(key) > -1 || node.get('first_name').toLowerCase().indexOf(key) > -1 || node.get('last_name').toLowerCase().indexOf(key) > -1))
           || (node.entity === 'channel' && (node.get('username').toLowerCase().indexOf(key) > -1 || node.get('name').toLowerCase().indexOf(key) > -1));
       },
+      minDepth: 1,
     });
   
     let users = [];
