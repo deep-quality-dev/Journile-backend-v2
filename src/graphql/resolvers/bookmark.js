@@ -57,14 +57,14 @@ export default {
         throw new UserInputError(`Post with id - ${post_id} isn't exist`)
       }
 
-      const bookmarkStatus = enable? 0: 1;
-      let bookmark = await models.PostRate.findOne({ where: { post_id, user_id: user.id } });
+      const bookmarkStatus = enable? 1: 0;
+      let bookmark = await models.Bookmark.findOne({ where: { post_id, user_id: user.id } });
       if (bookmark) {
         if (bookmark.status != bookmarkStatus)
-          await models.PostRate.update({ status: bookmarkStatus }, { where: { id: bookmark.id } })
+          await models.Bookmark.update({ status: bookmarkStatus }, { where: { id: bookmark.id } })
         return true
       } else {
-        bookmark = await models.PostRate.create({
+        bookmark = await models.Bookmark.create({
           post_id,
           user_id: user.id,
           status: bookmarkStatus,
