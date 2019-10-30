@@ -21,6 +21,7 @@ import profileSchema from './profile';
 import readSchema from './read';
 import scraperSchema from './scraper';
 import userSchema from './user';
+import userBlockSchema from './user_block';
 import userSettingSchema from './user_setting';
 import uploadSchema from './upload';
 import weatherSchema from './weather';
@@ -57,6 +58,7 @@ export default [
   readSchema,
   scraperSchema,
   userSchema,
+  userBlockSchema,
   userSettingSchema,
   uploadSchema,
   weatherSchema,

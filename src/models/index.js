@@ -173,6 +173,11 @@ models.User.belongsTo(models.City, { as: 'city', foreignKey: 'city_id' })
 models.Country.hasMany(models.User, { foreignKey: 'country_id' })
 models.User.belongsTo(models.Country, { as: 'country', foreignKey: 'country_id' })
 
+models.User.hasMany(models.UserBlock, { foreignKey: 'block_id' })
+models.UserBlock.belongsTo(models.User, { as: 'block', foreignKey: 'block_id' })
+models.User.hasMany(models.UserBlock, { foreignKey: 'user_id' })
+models.UserBlock.belongsTo(models.User, { foreignKey: 'user_id' })
+
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
     models[key].associate(models);
