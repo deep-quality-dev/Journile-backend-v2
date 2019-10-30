@@ -10,7 +10,6 @@ export default {
   Mutation: {
     ratePost: async (parent: any, params: any, context: any) => {
       const { input: { post_id, rate } } = params
-      const userRate = rate? 1: 2
       const { user } = context
       if (!user) {
         return false;
@@ -27,24 +26,16 @@ export default {
       const post = await models.Post.findByPk(post_id);
       if (!post) {
         throw new UserInputError(`Post with id - ${post_id} isn't exist`)
+      } else if (post.author_id == user.id) {
+        throw new UserInputError(`Can't rate your own post`)
       }
 
-      let postRate = await models.PostRate.findOne({ where: { post_id, user_id: user.id } });
+      let postRate = await models.PostRate.upsert({ post_id, user_id: user.id, status: rate }, { where: { post_id, user_id: user.id } });
       if (postRate) {
-        if (postRate.status != userRate) {
-          const result = await models.PostRate.update({ status: userRate }, { where: { id: postRate.id } });
-          graph.ratePost(result.get({ plain: true }));
-        }
+        graph.ratePost(postRate.get({ plain: true }));
         return true
       } else {
-        postRate = await models.PostRate.create({
-          post_id,
-          user_id: user.id,
-          status: userRate,
-        })
-        graph.ratePost(postRate.get({ plain: true }));
-
-        return !!postRate
+        return false
       }
     },
   },

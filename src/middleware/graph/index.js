@@ -252,6 +252,14 @@ class GraphManager {
 
       this.likes[postRate.id].unlink();
       delete this.likes[postRate.id];
+    } else if (postRate.status === 2) {
+      if (!this.likes[postRate.id]) {
+        logger.error('graph rate post error: ' + 'not existing rate - ' + postRate);
+        return;
+      }
+
+      this.likes[postRate.id].unlink();
+      delete this.likes[postRate.id];
     } else {
       if (!this.likes[postRate.id]) {
         this.likes[postRate.id] = this.g.createEdge('like');

@@ -23,6 +23,7 @@ const changeMethods = [
   'bulkCreate',
   'create',
   'update',
+  'upsert',
 ];
 
 function desymbolize(o) {
