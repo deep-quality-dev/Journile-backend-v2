@@ -23,7 +23,9 @@ import post from './post';
 import read from './read';
 import scraper from './scraper';
 import user from './user';
+import userBlock from './user_block';
 import userLogin from './user_login';
+import userMute from './user_mute';
 import userSetting from './user_setting';
 
 let sequelize: Sequelize = new Sequelize(
@@ -39,6 +41,7 @@ let sequelize: Sequelize = new Sequelize(
       min: 0,
       idle: 10000
     },
+    // logging: false,
   },
 );
 
@@ -82,7 +85,7 @@ models.Country = generateRedisModel(country(sequelize, Sequelize))
 models.Gammatag = generateRedisModel(gammatag(sequelize, Sequelize))
 models.Language = generateRedisModel(language(sequelize, Sequelize))
 models.PostComment = generateRedisModel(postComment(sequelize, Sequelize))
-models.PostHidden = generateRedisModel(postHidden(sequelize, Sequelize))
+models.PostHidden = postHidden(sequelize, Sequelize)
 models.PostMedia = generateRedisModel(postMedia(sequelize, Sequelize))
 models.PostRate = postRate(sequelize, Sequelize)
 models.PostReport = postReport(sequelize, Sequelize)
@@ -90,7 +93,9 @@ models.Post = generateRedisModel(post(sequelize, Sequelize))
 models.Read = generateRedisModel(read(sequelize, Sequelize))
 models.Scraper = scraper(sequelize, Sequelize)
 models.User = generateRedisModel(user(sequelize, Sequelize))
+models.UserBlock = userBlock(sequelize, Sequelize)
 models.UserLogin = userLogin(sequelize, Sequelize)
+models.UserMute = userMute(sequelize, Sequelize)
 models.UserSetting = generateRedisModel(userSetting(sequelize, Sequelize))
 
 

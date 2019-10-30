@@ -1,14 +1,7 @@
 /* @flow */
 
-const postHidden = (sequelize: any, DataTypes: any) => {
-  const PostHidden = sequelize.define('post_hidden', {
-    post_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
+const userMute = (sequelize: any, DataTypes: any) => {
+  const UserMute = sequelize.define('user_mute', {
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -16,8 +9,8 @@ const postHidden = (sequelize: any, DataTypes: any) => {
         notEmpty: true,
       },
     },
-    reason: {
-      type: DataTypes.STRING,
+    mute_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -37,7 +30,7 @@ const postHidden = (sequelize: any, DataTypes: any) => {
     timestamps: false,
   });
 
-  return PostHidden;
+  return UserMute;
 };
 
-export default postHidden;
+export default userMute;
