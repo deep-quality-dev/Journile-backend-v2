@@ -178,6 +178,11 @@ models.UserBlock.belongsTo(models.User, { as: 'block', foreignKey: 'block_id' })
 models.User.hasMany(models.UserBlock, { foreignKey: 'user_id' })
 models.UserBlock.belongsTo(models.User, { foreignKey: 'user_id' })
 
+models.User.hasMany(models.UserMute, { foreignKey: 'mute_id' })
+models.UserMute.belongsTo(models.User, { as: 'mute', foreignKey: 'mute_id' })
+models.User.hasMany(models.UserMute, { foreignKey: 'user_id' })
+models.UserMute.belongsTo(models.User, { foreignKey: 'user_id' })
+
 Object.keys(models).forEach(key => {
   if ('associate' in models[key]) {
     models[key].associate(models);
