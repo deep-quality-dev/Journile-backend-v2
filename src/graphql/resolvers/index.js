@@ -20,6 +20,7 @@ import profileResolvers from './profile';
 import readResolvers from './read';
 import scraperResolvers from './scraper';
 import userResolvers from './user';
+import userBlockResolvers from './user_block';
 import userSettingResolvers from './user_setting';
 import uploadResolvers from './upload';
 import weatherdResolvers from './weather';
@@ -48,6 +49,7 @@ export default [
   readResolvers,
   scraperResolvers,
   userResolvers,
+  userBlockResolvers,
   userSettingResolvers,
   uploadResolvers,
   weatherdResolvers,

@@ -1,14 +1,7 @@
 /* @flow */
 
-const postReport = (sequelize: any, DataTypes: any) => {
-  const PostReport = sequelize.define('post_report', {
-    post_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
+const userMute = (sequelize: any, DataTypes: any) => {
+  const UserMute = sequelize.define('user_mute', {
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -16,8 +9,8 @@ const postReport = (sequelize: any, DataTypes: any) => {
         notEmpty: true,
       },
     },
-    reason: {
-      type: DataTypes.STRING,
+    mute_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -37,7 +30,7 @@ const postReport = (sequelize: any, DataTypes: any) => {
     timestamps: false,
   });
 
-  return PostReport;
+  return UserMute;
 };
 
-export default postReport;
+export default userMute;

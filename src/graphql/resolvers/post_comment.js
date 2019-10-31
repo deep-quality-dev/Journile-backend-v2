@@ -23,8 +23,8 @@ function getQueryOption(info: any) {
 
 export default {
   Query: {
-    getPostComments: async (parent: any, args: any, context: any, info: any) => {
-      const { post_id } = args
+    getPostComments: async (parent: any, params: any, context: any, info: any) => {
+      const { post_id } = params
       const option = getQueryOption(info)
 
       return await models.PostComment.findAll({ where: { post_id }, ...option });

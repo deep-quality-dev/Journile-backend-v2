@@ -22,14 +22,14 @@ function getQueryOption(info: any) {
 
 export default {
   Query: {
-    getPostHiddens: async (parent: any, args: any, context: any, info: any) => {
+    getPostHiddens: async (parent: any, params: any, context: any, info: any) => {
       const option = getQueryOption(info)
 
       return await models.PostHidden.findAll({ ...option });
     },
 
-    getPostHidden: async (parent: any, args: any, context: any, info: any) => {
-      const { id } = args
+    getPostHidden: async (parent: any, params: any, context: any, info: any) => {
+      const { id } = params
       const option = getQueryOption(info)
 
       return await models.PostHidden.findByPk(id, { ...option });

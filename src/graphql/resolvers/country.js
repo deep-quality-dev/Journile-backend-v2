@@ -17,28 +17,28 @@ function getQueryOption(info: any) {
 
 export default {
   Query: {
-    getCountries: async (parent: any, args: any, context: any, info: any) => {
+    getCountries: async (parent: any, params: any, context: any, info: any) => {
       const option = getQueryOption(info)
 
       return await models.Country.findAll({ ...option });
     },
 
-    getCountry: async (parent: any, args: any, context: any, info: any) => {
-      const { id } = args
+    getCountry: async (parent: any, params: any, context: any, info: any) => {
+      const { id } = params
       const option = getQueryOption(info)
 
       return await models.Country.findByPk(id, { ...option });
     },
 
-    getCountryByCode: async (parent: any, args: any, context: any, info: any) => {
-      const { code } = args
+    getCountryByCode: async (parent: any, params: any, context: any, info: any) => {
+      const { code } = params
       const option = getQueryOption(info)
 
       return await models.Country.findOne({ where: { country_code: code }, ...option });
     },
 
-    getCountryByDialCode: async (parent: any, args: any, context: any, info: any) => {
-      const { dial_code } = args
+    getCountryByDialCode: async (parent: any, params: any, context: any, info: any) => {
+      const { dial_code } = params
       const option = getQueryOption(info)
 
       return await models.Country.findOne({ where: { dial_code }, ...option });

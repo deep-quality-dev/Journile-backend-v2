@@ -6,17 +6,17 @@ import models from '../../models';
 
 export default {
   Query: {
-    getLanguages: async (parent: any, args: any ) => {
+    getLanguages: async (parent: any, params: any ) => {
       return await models.Language.findAll();
     },
 
-    getLanguage: async (parent: any, args: any ) => {
-      const { id } = args
+    getLanguage: async (parent: any, params: any ) => {
+      const { id } = params
       return await models.Language.findByPk(id);
     },
 
-    getLanguageByCode: async (parent: any, args: any ) => {
-      const { code } = args
+    getLanguageByCode: async (parent: any, params: any ) => {
+      const { code } = params
       return await models.Language.findOne({ where: { code } });
     },
   },

@@ -20,14 +20,14 @@ function getQueryOption(info: any) {
 
 export default {
   Query: {
-    getContacts: async (parent: any, args: any, context: any, info: any) => {
+    getContacts: async (parent: any, params: any, context: any, info: any) => {
       const option = getQueryOption(info)
 
       return await models.Contact.findAll({ ...option });
     },
 
-    getUserContacts: async (parent: any, args: any, context: any, info: any) => {
-      const { user_id } = args
+    getUserContacts: async (parent: any, params: any, context: any, info: any) => {
+      const { user_id } = params
       const option = getQueryOption(info)
 
       return await models.Contact.findAll({ where: { user_id }, ...option });

@@ -1,14 +1,7 @@
 /* @flow */
 
-const postReport = (sequelize: any, DataTypes: any) => {
-  const PostReport = sequelize.define('post_report', {
-    post_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
+const userBlock = (sequelize: any, DataTypes: any) => {
+  const UserBlock = sequelize.define('user_block', {
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -16,8 +9,8 @@ const postReport = (sequelize: any, DataTypes: any) => {
         notEmpty: true,
       },
     },
-    reason: {
-      type: DataTypes.STRING,
+    block_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -37,7 +30,7 @@ const postReport = (sequelize: any, DataTypes: any) => {
     timestamps: false,
   });
 
-  return PostReport;
+  return UserBlock;
 };
 
-export default postReport;
+export default userBlock;
