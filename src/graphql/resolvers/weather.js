@@ -12,8 +12,8 @@ const Op = Sequelize.Op;
 
 export default {
   Query: {
-    getWeather: async (parent: any, args: any, context: any, info: any) => {
-      let { unit, country_code, city_name } = args
+    getWeather: async (parent: any, params: any, context: any, info: any) => {
+      let { unit, country_code, city_name } = params
       const { req, res } = context
 
       unit = (unit || 'c').toLowerCase();

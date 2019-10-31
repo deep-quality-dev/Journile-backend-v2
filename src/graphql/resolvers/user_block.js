@@ -49,6 +49,10 @@ export default {
         return false;
       }
 
+      if (block_id == user.id) {
+        throw new UserInputError(`Can't block yourself.`)
+      }
+
       const blockedUser = await models.User.findByPk(block_id);
       if (!blockedUser) {
         throw new UserInputError(`User with id - ${block_id} isn't exist`)
@@ -64,6 +68,10 @@ export default {
       const { user } = context
       if (!user) {
         return false;
+      }
+
+      if (block_id == user.id) {
+        throw new UserInputError(`Can't block yourself.`)
       }
 
       const blockedUser = await models.User.findByPk(block_id);

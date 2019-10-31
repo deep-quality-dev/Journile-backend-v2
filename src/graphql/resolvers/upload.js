@@ -25,8 +25,8 @@ function asyncFFMpeg(ff: any) {
 
 export default {
   Mutation: {
-    upload: async (parent: any, args: any, context: any, info: any) => {
-      const { file } = args
+    upload: async (parent: any, params: any, context: any, info: any) => {
+      const { file } = params
       const { createReadStream, filename, mimetype, encoding } = await file;
       let stream = createReadStream();
 

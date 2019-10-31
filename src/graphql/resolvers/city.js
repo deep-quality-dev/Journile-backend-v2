@@ -20,15 +20,15 @@ function getQueryOption(info: any) {
 
 export default {
   Query: {
-    getCitiesByCountryID: async (parent: any, args: any, context: any, info: any) => {
-      const { country_id } = args
+    getCitiesByCountryID: async (parent: any, params: any, context: any, info: any) => {
+      const { country_id } = params
       const option = getQueryOption(info)
 
       return await models.City.findAll({ where: { country_id }, ...option });
     },
 
-    getCitiesByCountryCode: async (parent: any, args: any, context: any, info: any) => {
-      const { country_code } = args
+    getCitiesByCountryCode: async (parent: any, params: any, context: any, info: any) => {
+      const { country_code } = params
       const option = getQueryOption(info)
 
       const country = await models.Country.findOne({ where: { country_code } });
@@ -39,15 +39,15 @@ export default {
       return await models.City.findAll({ where: { country_id: country.id }, ...option });
     },
 
-    getCity: async (parent: any, args: any, context: any, info: any) => {
-      const { id } = args
+    getCity: async (parent: any, params: any, context: any, info: any) => {
+      const { id } = params
       const option = getQueryOption(info)
 
       return await models.City.findByPk(id, { ...option });
     },
 
-    getCityByName: async (parent: any, args: any, context: any, info: any) => {
-      const { name } = args
+    getCityByName: async (parent: any, params: any, context: any, info: any) => {
+      const { name } = params
       const option = getQueryOption(info)
 
       return await models.City.findOne({ where: { name: { [Op.like]: `%${name}%` } }, ...option });

@@ -22,14 +22,14 @@ function getQueryOption(info: any) {
 
 export default {
   Query: {
-    getPostReports: async (parent: any, args: any, context: any, info: any) => {
+    getPostReports: async (parent: any, params: any, context: any, info: any) => {
       const option = getQueryOption(info)
 
       return await models.PostReport.findAll({ ...option });
     },
 
-    getPostReport: async (parent: any, args: any, context: any, info: any) => {
-      const { id } = args
+    getPostReport: async (parent: any, params: any, context: any, info: any) => {
+      const { id } = params
       const option = getQueryOption(info)
 
       return await models.PostReport.findByPk(id, { ...option });

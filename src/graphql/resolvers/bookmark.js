@@ -22,14 +22,14 @@ function getQueryOption(info: any) {
 
 export default {
   Query: {
-    getBookmarks: async (parent: any, args: any, context: any, info: any) => {
+    getBookmarks: async (parent: any, params: any, context: any, info: any) => {
       const option = getQueryOption(info)
 
       return await models.Bookmark.findAll({ ...option });
     },
 
-    getBookmark: async (parent: any, args: any, context: any, info: any) => {
-      const { id } = args
+    getBookmark: async (parent: any, params: any, context: any, info: any) => {
+      const { id } = params
       const option = getQueryOption(info)
 
       return await models.Bookmark.findByPk(id, { ...option });

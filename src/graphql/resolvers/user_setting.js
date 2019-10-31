@@ -17,7 +17,7 @@ function getQueryOption(info: any) {
 
 export default {
   Query: {
-    getUserSetting: async (parent: any, args: any, context: any, info: any) => {
+    getUserSetting: async (parent: any, params: any, context: any, info: any) => {
       const { user } = context
       if (!user) {
         throw new AuthenticationError("Not authorized");
@@ -27,8 +27,8 @@ export default {
       return await models.UserSetting.findOne({ where: { user_id: user.id }, ...option });
     },
 
-    getUserSettingByUserId: async (parent: any, args: any, context: any, info: any) => {
-      const { user_id } = args
+    getUserSettingByUserId: async (parent: any, params: any, context: any, info: any) => {
+      const { user_id } = params
       const option = getQueryOption(info)
 
       return await models.UserSetting.findOne({ where: { user_id }, ...option });

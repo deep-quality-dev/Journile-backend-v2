@@ -7,14 +7,14 @@ import graph from '../../middleware/graph';
 
 export default {
   Query: {
-    getUserReads: async (parent: any, args: any, context: any, info: any) => {
-      const { user_id } = args
+    getUserReads: async (parent: any, params: any, context: any, info: any) => {
+      const { user_id } = params
 
       return await models.Read.getUserReads(user_id);
     },
 
-    isReadingUser: async (parent: any, args: any, context: any ) => {
-      const { user_id } = args
+    isReadingUser: async (parent: any, params: any, context: any ) => {
+      const { user_id } = params
       const { user } = context
 
       const read = await models.Read.findOne({ where: { user_id: user.id, reading_id: user_id, type: 0 } });
@@ -22,8 +22,8 @@ export default {
       return read? read.status: 0;
     },
 
-    isReadingChannel: async (parent: any, args: any, context: any ) => {
-      const { channel_id } = args
+    isReadingChannel: async (parent: any, params: any, context: any ) => {
+      const { channel_id } = params
       const { user } = context
 
       const read = await models.Read.findOne({ where: { user_id: user.id, reading_id: channel_id, type: 1 } });
